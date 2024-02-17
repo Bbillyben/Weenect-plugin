@@ -110,13 +110,6 @@ class weenect extends eqLogic {
 
   public static function update_tracker($idTracker){
     log::add(__CLASS__, 'debug', "║ ╟─── create a new tracker $idTracker");
-    $eqLogic = eqLogic::create();
-    $eqLogic->setEqType(__CLASS__); 
-    $eqLogic->setConfiguration('tracker_id', $idTracker);
-
-    // Enregistrez le nouvel eqLogic
-    $eqLogic->save();
-    return $eqLogic;
 
   }
 
