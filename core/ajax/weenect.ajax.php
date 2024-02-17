@@ -17,6 +17,8 @@
 
 try {
     require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
+    require_once dirname(__FILE__) . '/../class/W_API.class.php';
+    require_once dirname(__FILE__) . '/../class/weenect.class.php';
     include_file('core', 'authentification', 'php');
 
     if (!isConnect('admin')) {
@@ -29,8 +31,25 @@ try {
   */
     ajax::init();
 
+    log::add('weenect','debug','╔═══ #################### AJAX action required :'.init('action'));
 
 
+    if(init('action') == "refresh_token"){
+      $uname = init('username');
+      $pass = init('password');
+
+      log::add('weenect', 'debug', '║ ╟─── username :'.$uname);
+      log::add('weenect', 'debug', '║ ╟─── username :'.$pass);
+      $result =W_API::get_token($uname, $pass);
+      log::add('weenect', 'debug', '║ ╟─── ajax result :'.$result);
+      ajax::success($result);
+    }
+    // update des données
+    if(init('action') == "update_data"){
+      $result = weenect::update_all();
+      ajax::success($result);
+    }
+    
     throw new Exception(__('Aucune méthode correspondante à', __FILE__) . ' : ' . init('action'));
     /*     * *********Catch exeption*************** */
 }

@@ -1,6 +1,6 @@
 {
-	"id": "template",
-	"name": "Template",
+	"id": "weenect",
+	"name": "Weenect",
 	"pluginVersion": "0.1",
 	"specialAttributes": {
 		"object": {
@@ -40,9 +40,9 @@
 		"fr_FR": "Template servant de base à la création de plugins pour Jeedom"
 	},
 	"licence": "AGPL",
-	"author": "Jeedom SAS",
+	"author": "Bbillyben",
 	"require": "4.2",
-	"category": "programming",
+	"category": "monitoring",
 	"hasDependency": false,
 	"hasOwnDeamon": false,
 	"maxDependancyInstallTime": 0,
