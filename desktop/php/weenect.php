@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . '/../../core/class/weenect.class.php';
 if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
@@ -6,6 +7,7 @@ if (!isConnect('admin')) {
 $plugin = plugin::byId('weenect');
 sendVarToJS('eqType', $plugin->getId());
 $eqLogics = eqLogic::byType($plugin->getId());
+$confList = weenect::W_CONF_common;
 ?>
 
 <div class="row row-overflow">
@@ -46,7 +48,9 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				echo '<img src="' . $eqLogic->getImage() . '"/>';
 				echo '<br>';
 				echo '<span class="name">' . $eqLogic->getHumanName(true, true) . '</span>';
-				echo '<span class="hiddenAsCard displayTableRight hidden">';
+				
+				echo '<span class=" displayTableRight">';
+				echo '<span class="">{{id}} :'.$eqLogic->getConfiguration('tracker_id').'</span>';
 				echo ($eqLogic->getIsVisible() == 1) ? '<i class="fas fa-eye" title="{{Equipement visible}}"></i>' : '<i class="fas fa-eye-slash" title="{{Equipement non visible}}"></i>';
 				echo '</span>';
 				echo '</div>';
@@ -127,39 +131,36 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							</div>
 
 							<legend><i class="fas fa-cogs"></i> {{Paramètres spécifiques}}</legend>
-							<div class="form-group">
-								<label class="col-sm-4 control-label">{{Nom du paramètre n°1}}
-									<sup><i class="fas fa-question-circle tooltips" title="{{Renseignez le paramètre n°1 de l'équipement}}"></i></sup>
+							<?php
+							foreach ($confList as $key=>$param){
+								echo '<div class="form-group">';
+								echo '<label class="col-sm-4 control-label">';
+								echo $param['name'];
+								if($param['info']){
+									echo '<sup><i class="fas fa-question-circle tooltips" title="';
+									echo $param['info'];
+									echo '"></i></sup>';
+								}
+								echo '</label>';
+								echo '<div class="col-sm-6">';
+								echo '<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="';
+								echo $key;
+								echo '" disabled>';
+								echo '</div>';
+								echo '</div>';
+
+
+
+							}
+							?>
+							<!-- <div class="form-group">
+								<label class="col-sm-4 control-label">{{Tracker Id}}
+									<sup><i class="fas fa-question-circle tooltips" title="{{Id du tracker}}"></i></sup>
 								</label>
 								<div class="col-sm-6">
-									<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="param1" placeholder="{{Paramètre n°1}}">
+									<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="tracker_id">
 								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-4 control-label"> {{Mot de passe}}
-									<sup><i class="fas fa-question-circle tooltips" title="{{Renseignez le mot de passe}}"></i></sup>
-								</label>
-								<div class="col-sm-6">
-									<input type="text" class="eqLogicAttr form-control inputPassword" data-l1key="configuration" data-l2key="password">
-								</div>
-							</div>
-							<!-- Exemple de champ de saisie du cron d'auto-actualisation avec assistant -->
-							<!-- La fonction cron de la classe du plugin doit contenir le code prévu pour que ce champ soit fonctionnel -->
-							<div class="form-group">
-								<label class="col-sm-4 control-label">{{Auto-actualisation}}
-									<sup><i class="fas fa-question-circle tooltips" title="{{Fréquence de rafraîchissement des commandes infos de l'équipement}}"></i></sup>
-								</label>
-								<div class="col-sm-6">
-									<div class="input-group">
-										<input type="text" class="eqLogicAttr form-control roundedLeft" data-l1key="configuration" data-l2key="autorefresh" placeholder="{{Cliquer sur ? pour afficher l'assistant cron}}">
-										<span class="input-group-btn">
-											<a class="btn btn-default cursor jeeHelper roundedRight" data-helper="cron" title="Assistant cron">
-												<i class="fas fa-question-circle"></i>
-											</a>
-										</span>
-									</div>
-								</div>
-							</div>
+							</div> -->
 						</div>
 
 						<!-- Partie droite de l'onglet "Équipement" -->

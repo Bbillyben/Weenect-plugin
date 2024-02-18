@@ -17,14 +17,15 @@
 
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
+require_once __DIR__  . '/W_API.class.php';
 
 class weenect extends eqLogic {
-
+  const DEFAULT_CRON = "*/30 * * * *";
   // définition des commandes
-  const CMD_common = array(
+  const W_CMD_common = array(
       // => en configuration 'tracker_id'=>array('name'=>'Tracker Id','type'=>'info', 'subtype'=>'string'),
-      'type'=>array('name'=>'Utilisateur dern commit','type'=>'info', 'subtype'=>'string'),
-      'date_tracker'=>array('name'=>'Utilisateur dern commit','type'=>'info', 'subtype'=>'string'),
+      'type'=>array('name'=>'type','type'=>'info', 'subtype'=>'string'),
+      'date_tracker'=>array('name'=>'dernière date','type'=>'info', 'subtype'=>'string'),
       
       // metrics 
       'battery'=>array('name'=>'Battery','type'=>'info', 'subtype'=>'numeric'),
@@ -37,41 +38,46 @@ class weenect extends eqLogic {
       'radius'=>array('name'=>'Radius','type'=>'info', 'subtype'=>'numeric'),
       
       // status
-      'is_online'=>array('name'=>'Online','type'=>'info', 'subtype'=>'string'),
-      'valid_signal'=>array('name'=>'Valid Signal','type'=>'info', 'subtype'=>'string'),  
-      'is_in_deep_sleep'=>array('name'=>'Deepsleep','type'=>'info', 'subtype'=>'string')
+      'is_online'=>array('name'=>'Online','type'=>'info', 'subtype'=>'binary'),
+      'valid_signal'=>array('name'=>'Valid Signal','type'=>'info', 'subtype'=>'binary'),  
+      'is_in_deep_sleep'=>array('name'=>'Deepsleep','type'=>'info', 'subtype'=>'binary'),
 
+      //action 
+      'refresh'=>array('name'=>'Refresh','type'=>'action', 'subtype'=>'other')
+
+  );
+  const W_CONF_common = array(
+    'tracker_id'=>array('name'=>'Tracker id', 'info'=>'Id du tracker', 'type'=>'string'),
+    'creation_date'=>array('name'=>'Date Creation', 'type'=>'date'),
+    'expiration_date'=>array('name'=>'Date Expiration', 'type'=>'date' , 'info'=>'Date d\'expiration de l\'abonnement'),
+    'warranty_end'=>array('name'=>'Date de Garantie', 'type'=>'date', 'info'=>'Date de fin de garantie du tracker'),
   );
 
 
-  // Update all eqLogic from data
-  public static function update_all(){
-
+  /* --------------------------------------------------------------------------------
+  ------------------------------   Fonction de mise à jour --------------------------
+  ---------------------------------------------------------------------------------- */
+  // get data from appi where only token is required
+  // handle the update of the token
+  public function get_api_data($api_cmd){
+    log::add(__CLASS__, 'debug', '║ ╟─── Task for api data :'.$api_cmd);
     $token = config::byKey('token', __CLASS__);
-    log::add(__CLASS__, 'debug', '║ ╔════════════════════ START Update Data');
-    
     if(!$token){
       log::add(__CLASS__, 'debug', '║ ╟─── Token  Not Found / start token retrieve');
       $token = weenect::update_token();
       if(!$token)return False;
     }
     log::add(__CLASS__, 'debug', '║ ╟─── Token  :'.$token);
-    $datas = W_API::get_tracker_position($token);
+    $datas = W_API::$api_cmd($token);
     if(!W_API::test_status($datas['status'])){
       log::add(__CLASS__, 'debug', '║ ╟─── curl status error : '.$datas['status'].' => try update token');
       $token = weenect::update_token();
       if(!$token)return False;
-      $datas = W_API::get_tracker_position($token);
+      W_API::$api_cmd($token);
       if(!W_API::test_status($datas['status']))return False;
     }
-    foreach($datas['result'] as $tracker){
-      weenect::update_tracker($tracker);
-    }
-    
-
-    return True;
+    return $datas;
   }
-
   // mise à jour du token
   // enregistrement du nouveau token dans la config de l'équipement pour usage ultérieur
   public static function update_token(){
@@ -88,37 +94,164 @@ class weenect extends eqLogic {
     config::save('token',$token, __CLASS__);
     return $token;
   }
+  // ==========================
+  // Update all eqLogic from data
+  // update both position and informations
+  public static function update_all(){
+    // $pos = weenect::update_position();
+    $gen = weenect::update_general();
+    $cronset = weenect::setUpdateCron();
+    // return $pos && $gen;
+    return array("next_due_date"=>$cronset);
+  }
+
+
+  //update position of trackers
+  public static function update_position(){
+    $datas = weenect::get_api_data('get_tracker_position');
+    log::add('weenect', 'debug', "║ ╠════════════════ position data : ".json_encode( $datas));
+    if(!$datas)return false;
+    foreach($datas['result'] as $tracker){
+      weenect::update_tracker($tracker);
+    }
+    return True;
+  }
+
+  // update datas other than positions
+  public static function update_general(){
+    $general = weenect::get_api_data('get_account_datas');
+    foreach($general['result']['items'] as $tracker){
+      log::add('weenect', 'debug', "║ ╠════════════════ update Configuration tracker : ".json_encode( $tracker));
+      weenect::update_general_tracker($tracker, TRUE);
+    }
+    return True;
+  }
 
   // mise à jour du tracker en fonction de son id
   // si auncun trouver en créé un nouveau
   public static function update_tracker($datas){
     $tId = $datas['tracker_id'];
-    log::add('weenect', 'debug', "║ ╠════════════════ update tracker  : ".$tId);
-    foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
-      // $idTracker = $eqLogic->getCmd(null, 'tracker_id');
-      $idTracker = $eqLogic->getConfiguration('tracker_id');
-      if($idTracker==$tId){
-        $eqLogic->updateCMDfromArray($datas['position']);
-        log::add('weenect', 'debug', "║ ╠════════════════ End update tracker ");
-        return true;
+    log::add('weenect', 'debug', "║ ╠════════════════ update tracker Position : ".$tId);
+    $eqLogic=eqLogic::byLogicalId($tId, "weenect");
+    if(!$eqLogic){
+      log::add(__CLASS__, 'debug', '║ ╟─── No Tracker found, create a new one ');
+      $eqLogic=weenect::create_new_tracker($tId);
+    }    
+    $eqLogic->updateCMDfromArray($datas['position'][0]);
+    log::add('weenect', 'debug', "║ ╠════════════════ End update tracker ");
+  }
+
+  public static function update_general_tracker($datas, $update_position = False){
+    $tId = $datas['id'];
+    log::add('weenect', 'debug', "║ ╠════════════════ update General tracker  : ".$tId);
+    $eqLogic=eqLogic::byLogicalId($tId, "weenect");
+    if(!$eqLogic){
+      log::add(__CLASS__, 'debug', '║ ╟─── No Tracker found, create a new one ');
+      $eqLogic=weenect::create_new_tracker($tId);
+    }
+    $eqLogic->updateCONFfromArray($datas, weenect::W_CONF_common);
+    if($update_position){
+      $datas['tracker_id']=$tId;
+      weenect::update_tracker($datas);
+    }
+    log::add('weenect', 'debug', "║ ╠════════════════ End update General tracker ");
+  }
+
+  public static function create_new_tracker($idTracker){
+    log::add(__CLASS__, 'debug', "║ ╟─── create a new tracker $idTracker");
+    
+    // récupération des données pour le nom du tracker
+    $data = weenect::get_api_data('get_account_datas');
+
+    foreach($data['result']['items'] as $tracker){
+      $id = W_API::gvfa($tracker, "id");
+      if($id && $id == $idTracker){
+        $name = W_API::gvfa($tracker, "name");
+        break;
+      
       }
     }
-    log::add(__CLASS__, 'debug', '║ ╟─── No Tracker found, create a new one ');
-    $eqLogic=weenect::create_new_tracker($idTracker);
-  }
+    if($name==undefined || !$name){
+      $name = "Tracker ".uniqid();
+    }
+    log::add(__CLASS__, 'debug', "║ ╟─── tracker name : $name");
 
-
-  public static function update_tracker($idTracker){
-    log::add(__CLASS__, 'debug', "║ ╟─── create a new tracker $idTracker");
-    $eqLogic = eqLogic::create();
-    $eqLogic->setEqType(__CLASS__); 
+    $eqLogic = new weenect();
+    $eqLogic->setName($name);
+    $eqLogic->setEqType_name('weenect'); 
+    $eqLogic->setLogicalId($idTracker);
+    $eqLogic->setIsEnable(1);
     $eqLogic->setConfiguration('tracker_id', $idTracker);
-
     // Enregistrez le nouvel eqLogic
     $eqLogic->save();
+    log::add(__CLASS__, 'debug', "║++++++++++++++++++>>>> ENABLED :".$eqLogic->getIsEnable());
     return $eqLogic;
-
   }
+
+  // format output from API to be more readable
+
+  public static function format_output($value, $type='string'){
+    switch ($type) {
+      case 'string':
+        return strval($value);
+      case 'date':
+          return preg_replace('/^(\d{4}-\d{2}-\d{2}).*$/', '$1', $value);
+      case 'time':
+          return str_replace(array('T','Z'),array(' ',''),$value);
+      default:
+          return $value;
+    }
+  }
+
+  /* -----------------------------------------------------------------------
+  ------------------------------   Fonction CRON  --------------------------
+  ------------------------------------------------------------------------- */
+  /** Function setUpdateCron : called when by ajax on configuraiton save
+	 * to update position of trackers  */
+  public static function setUpdateCron()
+	{ // called by ajax in config
+		log::add(__CLASS__, 'debug', "║  ╠════════════════ update cron called");
+
+		// get frequency from config
+		$freq = config::byKey('freq', __CLASS__);
+		if ($freq == 'prog') $freq = config::byKey('autorefresh', __CLASS__);
+
+		if ($freq == '' || is_null($freq)) { // set default if not set
+			log::add(__CLASS__, 'debug', "║ ╟─── ".__('Aucun Cron Défini pour la mise à jour, passage au défaut :', __FILE__) . self::DEFAULT_CRON);
+			$freq = self::DEFAULT_CRON;
+		}
+		log::add(__CLASS__, 'debug', "Add cron to freq : $freq ");
+		// update cron
+		$cron = cron::byClassAndFunction(__CLASS__, 'update_position');
+    if($freq == 'manual'){
+      if(is_object($cron)){
+        log::add(__CLASS__, 'debug', "║ ╟───  remove current cron");
+        $cron->remove();
+      }
+      return Null;
+    }
+
+		if (!is_object($cron)) {
+			$cron = new cron();
+			$cron->setClass(__CLASS__);
+			$cron->setFunction('update_position');
+		}
+		$cron->setEnable(1);
+		$cron->setDeamon(0);
+		$cron->setSchedule(checkAndFixCron($freq));
+		$cron->save();
+    return self::getDueDateStr($freq);
+
+	}
+  /** Function getDueDateStr : called when by getDueDate (ajax on configuration save) to get string from due date of cron job */
+	public static function getDueDateStr($freq)
+	{
+		$c = new Cron\CronExpression(checkAndFixCron($freq), new Cron\FieldFactory);
+		$calculatedDate = array('prevDate' => '', 'nextDate' => '');
+		$calculatedDate['prevDate'] = $c->getPreviousRunDate()->format('Y-m-d H:i:s');
+		$calculatedDate['nextDate'] = $c->getNextRunDate()->format('Y-m-d H:i:s');
+		return $calculatedDate;
+	}
 
   /*     * *************************Attributs****************************** */
 
@@ -222,7 +355,7 @@ class weenect extends eqLogic {
   // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
   public function postSave() {
     //     les commandes générales
-    $this->createCMDFromArray(weenect::CMD_common);
+    $this->createCMDFromArray(weenect::W_CMD_common);
   }
 
   // Fonction exécutée automatiquement avant la suppression de l'équipement
@@ -238,7 +371,9 @@ class weenect extends eqLogic {
       * contenant la clé status => 200 Ok si on doit remplir les données
   */
   public function updateCMDfromArray($data){
+    log::add(__CLASS__, 'debug', "║ ╟───────────── update commands :".json_encode($data));
     foreach($data as $logId => $val){
+      log::add(__CLASS__, 'debug', "║ ╟─── commands :".$logId);
         if($logId=='status')continue;
         $wCMD = $this->getCmd(null, $logId);
         if (is_object($wCMD)) {
@@ -248,8 +383,19 @@ class weenect extends eqLogic {
         }
     }
   }
-    
-    
+  public function updateCONFfromArray($data, $conf_array){
+    log::add(__CLASS__, 'debug', "║ ╟───────────── update configuration :".json_encode($data));
+    log::add(__CLASS__, 'debug', "║ ╟───────────── in  :".json_encode($conf_array));
+    foreach($conf_array as $logId => $conf){
+      log::add(__CLASS__, 'debug', "║ ║ ╟─ try find conf $logId (".array_key_exists($logId, $data).")");
+      if(array_key_exists($logId, $data)){
+        $conf_value = weenect::format_output($data[$logId], $conf['type']);
+        log::add(__CLASS__, 'debug', "║ ║ ╟─ update configuration $logId to $conf_value");
+        $this->setConfiguration($logId, $conf_value);
+      }
+    }
+    $this->save();
+  }
   /*    ----- fonction pour créer les commande à partir des array de définition de la classe 
      * dont les clé sont les logicalId des commandes
      * contenant les données name, type et subtype
@@ -313,6 +459,17 @@ class weenectCmd extends cmd {
 
   // Exécution d'une commande
   public function execute($_options = array()) {
+    log::add('weenect','debug', "╔═══════════════════════ execute CMD : ".$this->getId()." | ".$this->getHumanName().", logical id : ".$this->getLogicalId() ."  options : ".print_r($_options));
+    log::add('weenect','debug', '╠════ Eq logic '.$this->getEqLogic()->getHumanName());
+    switch($this->getLogicalId()){
+      case 'refresh':
+         weenect::update_position();
+        break;
+      default:
+        log::add('weenect','debug', '╠════ Default call');
+
+   } 
+   log::add('weenect','debug', "╚═════════════════════════════════════════ END execute CMD ");
   }
 
   /*     * **********************Getteur Setteur*************************** */

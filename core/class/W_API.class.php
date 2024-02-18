@@ -23,13 +23,19 @@ class W_API {
         return Null;        
     }
 
-    public static function get_tracker_data($token){
+    public static function get_tracker_position($token){
         log::add('weenect', 'debug', '║ ╟───  Request for trackers data');
         $dataCmd=W_API::computeCMD(W_API::TRACKER_POSITION_URL, $token);
         W_API::printData($dataCmd);
         return $dataCmd;
     }
 
+    public static function get_account_datas($token){
+        log::add('weenect', 'debug', '║ ╟───  Request account data');
+        $dataCmd=W_API::computeCMD(W_API::TRACKER_DATA_URL, $token);
+        W_API::printData($dataCmd);
+        return $dataCmd;
+    }
     // utilitaire
    // execution de la commande 
    // return un array avec status, header et result de la réponse
@@ -66,7 +72,7 @@ class W_API {
  // permet d'imprimer dans le debug les résultats
  public static function printData($data){
         foreach($data as $k=>$v){
-        log::add('weenect', 'debug', "║ ║ ╟─ $k : $v");
+        log::add('weenect', 'debug', "║ ║ ╟─ $k : ".json_encode($v));
         }
     }  
    // pBuild base header
@@ -115,6 +121,31 @@ class W_API {
         }
 
     }
+     // retourne une valeur à partir d'un array si la clé exiiste sinon false
+   public static function gvfa($arr, $val){
+    if(is_array($arr) && array_key_exists($val,$arr)){
+       return $arr[$val];
+    }else{
+       return false;
+    }
+
+ }
+     // retourne une valeur à partir d'un array si la suite de clé exiiste sinon false
+   public static function gvfaKR($arr, $id, $valArr){
+    if(!is_array($arr) || !array_key_exists($id,$arr))return false;
+
+    $pointeur=$arr[$id];
+
+    foreach($valArr as $val){
+       if(is_array($pointeur) && array_key_exists($val,$pointeur)){
+          $pointeur = $pointeur[$val];
+       }else{
+          return false;
+       }
+
+    }
+    return $pointeur;
+ }
 
     
 

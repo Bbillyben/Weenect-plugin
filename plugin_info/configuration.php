@@ -46,7 +46,7 @@ if (!isConnect()) {
         <sup><i class="fas fa-question-circle tooltips" title="{{fréquence d'interrogation de weenect}}"></i></sup>
       </label>
       <div class="col-md-4">
-        <select id="freq_selector" class="configKey form-control" data-l1key="param3">
+        <select id="freq_selector" class="configKey form-control" data-l1key="freq">
           <option value="manual">{{Manuel}}</option>
           <option value="* * * * *">1 {{minute}}</option>
           <option value="*/2 * * * *">2 {{minute}}</option>
