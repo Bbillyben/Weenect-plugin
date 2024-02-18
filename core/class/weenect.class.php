@@ -175,7 +175,6 @@ class weenect extends eqLogic {
       $name = "Tracker ".uniqid();
     }
     log::add(__CLASS__, 'debug', "║ ╟─── tracker name : $name");
-
     $eqLogic = new weenect();
     $eqLogic->setName($name);
     $eqLogic->setEqType_name('weenect'); 
@@ -184,7 +183,6 @@ class weenect extends eqLogic {
     $eqLogic->setConfiguration('tracker_id', $idTracker);
     // Enregistrez le nouvel eqLogic
     $eqLogic->save();
-    log::add(__CLASS__, 'debug', "║++++++++++++++++++>>>> ENABLED :".$eqLogic->getIsEnable());
     return $eqLogic;
   }
 
