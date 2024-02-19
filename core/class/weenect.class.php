@@ -17,9 +17,10 @@
 
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
+require_once __DIR__  . '/weenect_base.class.php';
 require_once __DIR__  . '/W_API.class.php';
 
-class weenect extends eqLogic {
+class weenect extends weenect_base {
   const DEFAULT_CRON = "*/30 * * * *";
   // définition des commandes
   const W_CMD_common = array(
@@ -36,6 +37,7 @@ class weenect extends eqLogic {
       'latitude'=>array('name'=>'Latitude','type'=>'info', 'subtype'=>'numeric'),
       'longitude'=>array('name'=>'Longitude','type'=>'info', 'subtype'=>'numeric'),
       'radius'=>array('name'=>'Radius','type'=>'info', 'subtype'=>'numeric'),
+      'coord'=>array('name'=>'Coordonnées','type'=>'info', 'subtype'=>'string'),
       
       // status
       'is_online'=>array('name'=>'Online','type'=>'info', 'subtype'=>'binary'),
@@ -138,6 +140,7 @@ class weenect extends eqLogic {
       $eqLogic=weenect::create_new_tracker($tId);
     }    
     $eqLogic->updateCMDfromArray($datas['position'][0]);
+    $eqLogic->update_coordinate();
     log::add('weenect', 'debug', "║ ╠════════════════ End update tracker ");
   }
 
@@ -186,20 +189,7 @@ class weenect extends eqLogic {
     return $eqLogic;
   }
 
-  // format output from API to be more readable
 
-  public static function format_output($value, $type='string'){
-    switch ($type) {
-      case 'string':
-        return strval($value);
-      case 'date':
-          return preg_replace('/^(\d{4}-\d{2}-\d{2}).*$/', '$1', $value);
-      case 'time':
-          return str_replace(array('T','Z'),array(' ',''),$value);
-      default:
-          return $value;
-    }
-  }
 
   /* -----------------------------------------------------------------------
   ------------------------------   Fonction CRON  --------------------------
@@ -354,6 +344,7 @@ class weenect extends eqLogic {
   public function postSave() {
     //     les commandes générales
     $this->createCMDFromArray(weenect::W_CMD_common);
+    $this->update_coordinate();
   }
 
   // Fonction exécutée automatiquement avant la suppression de l'équipement
@@ -364,56 +355,70 @@ class weenect extends eqLogic {
   public function postRemove() {
   }
 
-  /*    ----- fonction pour mettre à jour les valeurs à partir d'un array 
-      * dont les clé sont les logicalId des commandes (cf les array de classe)
-      * contenant la clé status => 200 Ok si on doit remplir les données
-  */
-  public function updateCMDfromArray($data){
-    log::add(__CLASS__, 'debug', "║ ╟───────────── update commands :".json_encode($data));
-    foreach($data as $logId => $val){
-      log::add(__CLASS__, 'debug', "║ ╟─── commands :".$logId);
-        if($logId=='status')continue;
-        $wCMD = $this->getCmd(null, $logId);
-        if (is_object($wCMD)) {
-          log::add(__CLASS__, 'debug', "║ ║ ╟─ update commande $logId to $val");
-          $wCMD->event($val);
-          $wCMD->save();
-        }
+  public function update_coordinate(){
+    log::add(__CLASS__, 'debug', "║ ╟───────────── update coordinates ");
+    $wCMD = $this->getCmd(null, "coord");
+    if (!is_object($wCMD)){
+      $this->createCMDFromArray([weenect::W_CMD_common['coord']]);
     }
-  }
-  public function updateCONFfromArray($data, $conf_array){
-    log::add(__CLASS__, 'debug', "║ ╟───────────── update configuration :".json_encode($data));
-    log::add(__CLASS__, 'debug', "║ ╟───────────── in  :".json_encode($conf_array));
-    foreach($conf_array as $logId => $conf){
-      log::add(__CLASS__, 'debug', "║ ║ ╟─ try find conf $logId (".array_key_exists($logId, $data).")");
-      if(array_key_exists($logId, $data)){
-        $conf_value = weenect::format_output($data[$logId], $conf['type']);
-        log::add(__CLASS__, 'debug', "║ ║ ╟─ update configuration $logId to $conf_value");
-        $this->setConfiguration($logId, $conf_value);
-      }
-    }
-    $this->save();
-  }
-  /*    ----- fonction pour créer les commande à partir des array de définition de la classe 
-     * dont les clé sont les logicalId des commandes
-     * contenant les données name, type et subtype
- */
- public function createCMDFromArray($arrayCMD){
-   foreach($arrayCMD as $logId => $setting){
-      $wCMD = $this->getCmd(null, $logId);
-      if (!is_object($wCMD)) {
-        $wCMD = new weenectCmd();
-        $wCMD->setLogicalId($logId);
-        $wCMD->setIsVisible(1);
-        $wCMD->setName(__($setting['name'], __FILE__));
-        log::add(__CLASS__, 'debug', "╟─ creation de la commande : ".$setting['name']." - $logId  de type : ".$setting['type'].'|'.$setting['subtype']);
-      }
-      $wCMD->setType($setting['type']);
-      $wCMD->setSubType($setting['subtype']);
-      $wCMD->setEqLogic_id($this->getId());
+    $latCMD = $this->getCmd(null, "latitude");
+    $longCMD = $this->getCmd(null, "longitude");
+    if(is_object($latCMD) && is_object($longCMD)){
+      $coord = $latCMD->execCmd() . "," . $longCMD->execCmd();
+      $wCMD->event($coord);
       $wCMD->save();
     }
- }
+  }
+//   /*    ----- fonction pour mettre à jour les valeurs à partir d'un array 
+//       * dont les clé sont les logicalId des commandes (cf les array de classe)
+//       * contenant la clé status => 200 Ok si on doit remplir les données
+//   */
+//   public function updateCMDfromArray($data){
+//     log::add(__CLASS__, 'debug', "║ ╟───────────── update commands :".json_encode($data));
+//     foreach($data as $logId => $val){
+//       log::add(__CLASS__, 'debug', "║ ╟─── commands :".$logId);
+//         if($logId=='status')continue;
+//         $wCMD = $this->getCmd(null, $logId);
+//         if (is_object($wCMD)) {
+//           log::add(__CLASS__, 'debug', "║ ║ ╟─ update commande $logId to $val");
+//           $wCMD->event($val);
+//           $wCMD->save();
+//         }
+//     }
+//   }
+//   public function updateCONFfromArray($data, $conf_array){
+//     log::add(__CLASS__, 'debug', "║ ╟───────────── update configuration :".json_encode($data));
+//     log::add(__CLASS__, 'debug', "║ ╟───────────── in  :".json_encode($conf_array));
+//     foreach($conf_array as $logId => $conf){
+//       log::add(__CLASS__, 'debug', "║ ║ ╟─ try find conf $logId (".array_key_exists($logId, $data).")");
+//       if(array_key_exists($logId, $data)){
+//         $conf_value = weenect::format_output($data[$logId], $conf['type']);
+//         log::add(__CLASS__, 'debug', "║ ║ ╟─ update configuration $logId to $conf_value");
+//         $this->setConfiguration($logId, $conf_value);
+//       }
+//     }
+//     $this->save();
+//   }
+//   /*    ----- fonction pour créer les commande à partir des array de définition de la classe 
+//      * dont les clé sont les logicalId des commandes
+//      * contenant les données name, type et subtype
+//  */
+//  public function createCMDFromArray($arrayCMD){
+//    foreach($arrayCMD as $logId => $setting){
+//       $wCMD = $this->getCmd(null, $logId);
+//       if (!is_object($wCMD)) {
+//         $wCMD = new weenectCmd();
+//         $wCMD->setLogicalId($logId);
+//         $wCMD->setIsVisible(1);
+//         $wCMD->setName(__($setting['name'], __FILE__));
+//         log::add(__CLASS__, 'debug', "╟─ creation de la commande : ".$setting['name']." - $logId  de type : ".$setting['type'].'|'.$setting['subtype']);
+//       }
+//       $wCMD->setType($setting['type']);
+//       $wCMD->setSubType($setting['subtype']);
+//       $wCMD->setEqLogic_id($this->getId());
+//       $wCMD->save();
+//     }
+//  }
 
 
 
