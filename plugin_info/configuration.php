@@ -24,6 +24,7 @@ if (!isConnect()) {
 ?>
 <form class="form-horizontal">
   <fieldset>
+  <legend><i class="fa fa-list-alt"></i> {{Connexion Weenect API}}</legend>
     <div class="form-group">
       <label class="col-md-4 control-label">{{Nom d'utilisateur}}
         <sup><i class="fas fa-question-circle tooltips" title="{{Renseignez le nom d'utilisateur du compte weenect}}"></i></sup>
@@ -87,6 +88,26 @@ if (!isConnect()) {
     </div>
 
   </fieldset>
+
+  <fieldset>
+    <legend><i class="fa fa-list-alt"></i> {{Paramètres Zones}}</legend>
+    <div class="form-group">
+        <label class="col-lg-4 control-label">{{Ajouter le nom du tracker à celui des zones}}</label>
+        <div class="col-lg-4">
+            <input type="checkbox" class="configKey form-control" data-l1key="add-tracker-name" checked/>
+        </div>
+    </div>
+    <div class="form-group">
+            <label class="col-lg-4 control-label">{{Lier la configuration des zones au tracker }}
+            <sup><i class="fas fa-question-circle tooltips" title="{{object parent, catégories}}"></i></sup>
+            </label>
+            <div class="col-lg-4">
+                <input type="checkbox" class="configKey form-control" data-l1key="link-tracker-conf" checked/>
+            </div>
+        </div>
+  </fieldset>
+
+
 </form>
 
 <?php include_file('desktop', 'weenect_conf', 'js', 'weenect'); ?>

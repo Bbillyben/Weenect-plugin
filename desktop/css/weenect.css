@@ -1,0 +1,75 @@
+div.eqLogicThumbnailContainer .eqLogicDisplayCardSecondary.cursor.displayAsTable:last-child
+{
+  margin-bottom: 13px !important;
+}
+div.eqLogicThumbnailContainer .eqLogicDisplayCardSecondary.cursor.displayAsTable:first-child
+{
+  margin-top: 8px !important;
+}
+div.eqLogicThumbnailContainer .eqLogicDisplayCardSecondary.cursor.displayAsTable
+{
+  position: relative !important;
+  top: 2px !important;
+  left: 0 !important;
+  min-width: 100% !important;
+  text-align: left;
+  min-height: 24px !important;
+  max-height: 24px !important;
+  transform: unset !important;
+  margin: 0 !important;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  padding: 0 !important;
+}
+div.eqLogicThumbnailContainer div.eqLogicDisplayCardSecondary.cursor
+{
+  min-width: 130px !important;
+  max-width: auto !important;
+  width: auto;
+  margin-bottom: 10px !important;
+  height: 168px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+}
+div.eqLogicThumbnailContainer .eqLogicDisplayCardSecondary
+{
+  height: 168px !important;
+}
+.eqLogicDisplayCardSecondary div.cursor
+{
+  margin-bottom: 5px !important;
+  padding: 5px !important;
+}
+.eqLogicDisplayCardSecondary:not(.disableCard)
+{
+  opacity: 1 !important;
+  transition-property: opacity;
+  transition-duration: 0.6s;
+}
+.eqLogicDisplayCardSecondary.disableCard
+{
+  opacity: 0.5 !important;
+  transition-property: opacity;
+  transition-duration: 0.6s;
+}
+.eqLogicDisplayCardSecondary
+{
+  border: none !important;
+  background: transparent !important;
+  padding-top: 0 !important;
+  text-align: center;
+  cursor: pointer !important;
+}
+
+
+div.eqLogicThumbnailContainer .card img
+{
+  height: 80px !important;
+  width: unset !important;
+  padding-top: 15px;
+}
+div.eqLogicThumbnailContainer .card
+{
+  margin-left:1em;
+}

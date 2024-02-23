@@ -1,67 +1,28 @@
 <?php
-require_once dirname(__FILE__) . '/../../core/class/weenect.class.php';
 require_once dirname(__FILE__) . '/../../core/class/weenect_zone.class.php';
 if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
 // Déclaration des variables obligatoires
-$plugin = plugin::byId('weenect');
-sendVarToJS('eqType', $plugin->getId());
-$eqLogics = eqLogic::byType($plugin->getId());
-$confList = weenect::W_CONF_common;
+// $plugin = plugin::byId('weenect');
+sendVarToJS('eqType', "weenect_zone");
+// $urlParts = parse_url($_SERVER['REQUEST_URI']);
+// parse_str($urlParts['query'], $queryParams);
+// if (isset($queryParams['tracker'])) {
+// 	$tId = $queryParams['tracker'];
+// 	$queryParams['id'] = $tId;
+// 	$newQueryString = http_build_query($queryParams);
+// 	$newUrl = $urlParts['path'] . '?' . $newQueryString;
+// }
+// echo "<div>  TiD : ".$tId." </div>";
+// echo "<div> nex URI: ".$newUrl." </div>";
+$eqLogics = eqLogic::byType("weenect");
+$confList = weenect_zone::WZ_CONF_common;
 ?>
-<?php include_file('desktop', 'weenect', 'css', 'weenect'); ?>
 
 <div class="row row-overflow">
-	<!-- Page d'accueil du plugin -->
-	<div class="col-xs-12 eqLogicThumbnailDisplay">
-		<legend><i class="fas fa-cog"></i> {{Gestion}}</legend>
-		<!-- Boutons de gestion du plugin -->
-		<div class="eqLogicThumbnailContainer">
-			<!-- <div class="cursor eqLogicAction logoPrimary" data-action="add">
-				<i class="fas fa-plus-circle"></i>
-				<br>
-				<span>{{Ajouter}}</span>
-			</div> -->
-			<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
-				<i class="fas fa-wrench"></i>
-				<br>
-				<span>{{Configuration}}</span>
-			</div>
-		</div>
-		<legend><i class="fas fa-mobile"></i> {{Mes Trackers}}</legend>
-		<?php
-		if (count($eqLogics) == 0) {
-			echo '<br><div class="text-center" style="font-size:1.2em;font-weight:bold;">{{Aucun équipement Template trouvé, cliquer sur "Ajouter" pour commencer}}</div>';
-		} else {
-			// Champ de recherche
-			echo '<div class="input-group" style="margin:5px;">';
-			echo '<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic">';
-			echo '<div class="input-group-btn">';
-			echo '<a id="bt_resetSearch" class="btn" style="width:30px"><i class="fas fa-times"></i></a>';
-			echo '<a class="btn roundedRight hidden" id="bt_pluginDisplayAsTable" data-coreSupport="1" data-state="0"><i class="fas fa-grip-lines"></i></a>';
-			echo '</div>';
-			echo '</div>';
-			// Liste des équipements du plugin
-			echo '<div class="eqLogicThumbnailContainer">';
-			foreach ($eqLogics as $eqLogic) {
-				$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
-				echo '<div class="eqLogicDisplayCard cursor ' . $opacity . '" data-eqLogic_id="' . $eqLogic->getId() . '">';
-				echo '<img src="' . $eqLogic->getImage() . '"/>';
-				echo '<br>';
-				echo '<span class="name">' . $eqLogic->getHumanName(true, true) . '</span>';
-				
-				echo '<span class=" displayTableRight">';
-				echo '<span class="">{{id}} :'.$eqLogic->getConfiguration('tracker_id').'</span>';
-				echo ($eqLogic->getIsVisible() == 1) ? '<i class="fas fa-eye" title="{{Equipement visible}}"></i>' : '<i class="fas fa-eye-slash" title="{{Equipement non visible}}"></i>';
-				echo '</span>';
-				echo '</div>';
-			}
-			echo '</div>';
-		}
-		?>
-	</div> <!-- /.eqLogicThumbnailDisplay -->
-
+	
+	
 	<!-- Page de présentation de l'équipement -->
 	<div class="col-xs-12 eqLogic" style="display: none;">
 		<!-- barre de gestion de l'équipement -->
@@ -70,16 +31,14 @@ $confList = weenect::W_CONF_common;
 				<!-- Les balises <a></a> sont volontairement fermées à la ligne suivante pour éviter les espaces entre les boutons. Ne pas modifier -->
 				<a class="btn btn-sm btn-default eqLogicAction roundedLeft" data-action="configure"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Configuration avancée}}</span>
 				</a><a class="btn btn-sm btn-success eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}
-				</a><a class="btn btn-sm btn-danger eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}
 				</a>
 			</span>
 		</div>
 		<!-- Onglets -->
 		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
+			<li role="presentation"><a><i id="weenect_back" class="fas fa-arrow-circle-left"></a></i></li>
 			<li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
 			<li role="presentation"><a href="#commandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i> {{Commandes}}</a></li>
-			<li role="presentation"><a href="#zonetab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-map"></i> {{Zones}}</a></li>
 		</ul>
 		<div class="tab-content">
 			<!-- Onglet de configuration de l'équipement -->
@@ -116,11 +75,11 @@ $confList = weenect::W_CONF_common;
 								<label class="col-sm-4 control-label">{{Catégorie}}</label>
 								<div class="col-sm-6">
 									<?php
-										foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
-											echo '<label class="checkbox-inline">';
-											echo '<input type="checkbox" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" >' . $value['name'];
-											echo '</label>';
-										}									
+									foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
+										echo '<label class="checkbox-inline">';
+										echo '<input type="checkbox" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" >' . $value['name'];
+										echo '</label>';
+									}
 									?>
 								</div>
 							</div>
@@ -195,45 +154,6 @@ $confList = weenect::W_CONF_common;
 					</table>
 				</div>
 			</div><!-- /.tabpanel #commandtab-->
-			<!-- Onglet des zones de l'équipement -->
-			<div role="tabpanel" class="tab-pane" id="zonetab">
-				
-				<br><br>
-				<div class=""> {{liste des zones affiliées à l'équipement}}</div>
-				<div id="zone_list"></div>
-
-				<div class="table-responsive">
-					<?php
-					if (count($eqLogics) != 0){
-						$zoneId =  json_decode($eqLogic->getConfiguration('related_zones'));
-						$zones = weenect_zone::byTracker($eqLogic->getLogicalId());
-						// echo 'All zones id : '.$zoneId;
-						echo '<div class="eqLogicThumbnailContainer" style="display:flex;">';
-						foreach($zones as $zone ){
-							// $zone = eqlogic::byLogicalId($id, 'weenect_zone');
-							// echo "<br>zone $id exist ? :".(is_object($zone)?1:0);
-							if(!is_object($zone))continue;
-							$opacity = ($zone->getIsEnable()) ? '' : 'disableCard';
-							echo '<div class="eqLogicDisplayCardSecondary card ' . $opacity . '" data-eqLogic_id="' . $zone->getId() . '">';
-							echo '<img class="card-img-top" src="'.$plugin->getPathImgIcon().'" alt="Card image cap">';
-							
-							// echo '<br>';
-							echo '<div class="card-name">' . $zone->getHumanName(true, true) . '</div>';
-							echo '<span class=" displayTableRight">';
-							echo '<div class="card-text">{{Tracker id}} :'.$zone->getConfiguration('tracker_id').'</div>';
-							echo ($zone->getIsVisible() == 1) ? '<i class="fas fa-eye" title="{{Equipement visible}}"></i>' : '<i class="fas fa-eye-slash" title="{{Equipement non visible}}"></i>';
-							echo '</span>';
-							echo '</div>';
-
-							
-						}
-						echo '</div>';
-					}
-						
-					?>
-				</div>
-			</div><!-- /.tabpanel #zonetab-->
-
 
 		</div><!-- /.tab-content -->
 	</div><!-- /.eqLogic -->

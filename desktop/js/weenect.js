@@ -84,4 +84,55 @@ function addCmdToTable(_cmd) {
       jeedom.cmd.changeType(tr, init(_cmd.subType))
     }
   })
+  // bind_weenect_zone();
+  // bind_weenect_back();
 }
+
+
+// $(document).ready(function(){
+  
+//   // click sur les zone dans l'equipement du tracker
+//   bind_weenect_zone();
+//   // for the back in weenect_zone
+//   bind_weenect_back();
+
+// })
+
+function printEqLogic(_eqLogic) {
+  console.log(_eqLogic);
+    if(_eqLogic.eqType_name =="weenect"){
+      bind_weenect_zone();
+    }else if(_eqLogic.eqType_name =="weenect_zone"){
+      bind_weenect_back();
+    }
+}
+function bind_weenect_zone(){
+  console.log("bind_weenect_zone");
+  $("div.eqLogicThumbnailContainer div.eqLogicDisplayCardSecondary").click(function(){
+    var tId = getUrlVars('id');
+    var urlParam = new URLSearchParams(window.location.search);
+    urlParam.set('p', "weenect_zone");
+    urlParam.set('id',  $(this).attr('data-eqLogic_id'));
+    urlParam.set('tracker',  tId);
+    var urlNav = window.location.href.split('?')[0] + '?' + urlParam.toString();
+    console.log(" Zone URL :"+urlNav);
+    jeedomUtils.loadPage(urlNav);
+  });
+}
+
+function bind_weenect_back(){
+  console.log("bind_weenect_back");
+  $("#weenect_back").unbind().click(function(){
+    var tId = getUrlVars('tracker');
+    var urlParam = new URLSearchParams(window.location.search);
+    urlParam.set('p', "weenect");
+    urlParam.set('id',  tId);
+    urlParam.delete('tracker');
+    var urlNav = window.location.href.split('?')[0] + '?' + urlParam.toString()+"#zonetab";
+    console.log("back url :"+urlNav);
+    jeedomUtils.loadPage(urlNav);
+  });
+}
+
+
+ 

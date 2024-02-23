@@ -18,6 +18,7 @@
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/weenect_base.class.php';
+require_once __DIR__  . '/weenect_zone.class.php';
 require_once __DIR__  . '/W_API.class.php';
 
 class weenect extends weenect_base {
@@ -45,17 +46,44 @@ class weenect extends weenect_base {
       'is_in_deep_sleep'=>array('name'=>'Deepsleep','type'=>'info', 'subtype'=>'binary'),
 
       //action 
-      'refresh'=>array('name'=>'Refresh','type'=>'action', 'subtype'=>'other')
+      'update'=>array('name'=>'Mettre à jour','type'=>'action', 'subtype'=>'other'),
+
+      //date 
+      // 'creation_date'=>array('name'=>'Date Creation', 'type'=>'info', 'subtype'=>'string'),
+      'expiration_date'=>array('name'=>'Date Expiration', 'type'=>'info' , 'subtype'=>'string'),
+      // 'warranty_end'=>array('name'=>'Date de Garantie', 'type'=>'info', 'subtype'=>'string'),
+
+      // zone en cours
+      'curr_zone_id'=>array('name'=>'Id Zone Courante','type'=>'info', 'subtype'=>'string'),
+      'curr_zone_name'=>array('name'=>'Nom Zone Courante','type'=>'info', 'subtype'=>'string'),
 
   );
   const W_CONF_common = array(
     'tracker_id'=>array('name'=>'Tracker id', 'info'=>'Id du tracker', 'type'=>'string'),
     'creation_date'=>array('name'=>'Date Creation', 'type'=>'date'),
-    'expiration_date'=>array('name'=>'Date Expiration', 'type'=>'date' , 'info'=>'Date d\'expiration de l\'abonnement'),
+    // 'expiration_date'=>array('name'=>'Date Expiration', 'type'=>'date' , 'info'=>'Date d\'expiration de l\'abonnement'),
     'warranty_end'=>array('name'=>'Date de Garantie', 'type'=>'date', 'info'=>'Date de fin de garantie du tracker'),
+    'related_zones'=>array('name'=>'Zones', 'info'=>'Zones attaché au trackers', 'hidden'=>true),
+    'former_name'=>array('name'=>'former name', 'info'=>'ancien nom equipement', 'hidden'=>true),
   );
 
-
+  /* --------------------------------------------------------------------------------
+  ------------------------------   Util calcul distance  --------------------------
+  ---------------------------------------------------------------------------------- */
+  public static function distance($_a, $_b) {
+      $a = explode(',', $_a);
+      $b = explode(',', $_b);
+      $earth_radius = 6378.137;
+      $rlo1 = deg2rad($a[1]);
+      $rla1 = deg2rad($a[0]);
+      $rlo2 = deg2rad($b[1]);
+      $rla2 = deg2rad($b[0]);
+      $dlo = ($rlo2 - $rlo1) / 2;
+      $dla = ($rla2 - $rla1) / 2;
+      $a = (sin($dla) * sin($dla)) + cos($rla1) * cos($rla2) * (sin($dlo) * sin($dlo));
+      $d = 2 * atan2(sqrt($a), sqrt(1 - $a));
+      return round(($earth_radius * $d)*1000, 2);
+  }
   /* --------------------------------------------------------------------------------
   ------------------------------   Fonction de mise à jour --------------------------
   ---------------------------------------------------------------------------------- */
@@ -139,8 +167,10 @@ class weenect extends weenect_base {
       log::add(__CLASS__, 'debug', '║ ╟─── No Tracker found, create a new one ');
       $eqLogic=weenect::create_new_tracker($tId);
     }    
+    $eqLogic->updateCMDfromArray($datas);// for general informations
     $eqLogic->updateCMDfromArray($datas['position'][0]);
-    $eqLogic->update_coordinate();
+    $eqLogic->update_coordinate(self::W_CMD_common['coord']);
+    $eqLogic->updateCurrentZone();
     log::add('weenect', 'debug', "║ ╠════════════════ End update tracker ");
   }
 
@@ -153,10 +183,22 @@ class weenect extends weenect_base {
       $eqLogic=weenect::create_new_tracker($tId);
     }
     $eqLogic->updateCONFfromArray($datas, weenect::W_CONF_common);
+    // zone update
+
+    if(array_key_exists("zones", $datas)){
+      $ids = array_map(function($item) {return $item["id"];}, $datas['zones']);
+      $isSet = $eqLogic->setConfiguration('related_zones', json_encode($ids));
+      $eqLogic->save();
+      weenect_zone::update_zones($eqLogic, $datas['zones']);
+    }
+
+    // position update
     if($update_position){
+      log::add('weenect', 'debug', "position update datas :".json_encode($datas));
       $datas['tracker_id']=$tId;
       weenect::update_tracker($datas);
     }
+    $eqLogic->updateCurrentZone();
     log::add('weenect', 'debug', "║ ╠════════════════ End update General tracker ");
   }
 
@@ -258,65 +300,6 @@ class weenect extends weenect_base {
 
   /*     * ***********************Methode static*************************** */
 
-  /*
-  * Fonction exécutée automatiquement toutes les minutes par Jeedom
-  public static function cron() {}
-  */
-
-  /*
-  * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
-  public static function cron5() {}
-  */
-
-  /*
-  * Fonction exécutée automatiquement toutes les 10 minutes par Jeedom
-  public static function cron10() {}
-  */
-
-  /*
-  * Fonction exécutée automatiquement toutes les 15 minutes par Jeedom
-  public static function cron15() {}
-  */
-
-  /*
-  * Fonction exécutée automatiquement toutes les 30 minutes par Jeedom
-  public static function cron30() {}
-  */
-
-  /*
-  * Fonction exécutée automatiquement toutes les heures par Jeedom
-  public static function cronHourly() {}
-  */
-
-  /*
-  * Fonction exécutée automatiquement tous les jours par Jeedom
-  public static function cronDaily() {}
-  */
-  
-  /*
-  * Permet de déclencher une action avant modification d'une variable de configuration du plugin
-  * Exemple avec la variable "param3"
-  public static function preConfig_param3( $value ) {
-    // do some checks or modify on $value
-    return $value;
-  }
-  */
-
-  /*
-  * Permet de déclencher une action après modification d'une variable de configuration du plugin
-  * Exemple avec la variable "param3"
-  public static function postConfig_param3($value) {
-    // no return value
-  }
-  */
-
-  /*
-   * Permet d'indiquer des éléments supplémentaires à remonter dans les informations de configuration
-   * lors de la création semi-automatique d'un post sur le forum community
-   public static function getConfigForCommunity() {
-      return "les infos essentiel de mon plugin";
-   }
-   */
 
   /*     * *********************Méthodes d'instance************************* */
 
@@ -338,89 +321,82 @@ class weenect extends weenect_base {
 
   // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
   public function preSave() {
+    //synchro des zones
+    $odlName= $this->getConfiguration('former_name');
+    $zones = weenect_zone::byTracker($this->getLogicalId());
+    foreach ($zones as $zone){
+      $zone->updateFromTracker($this, $odlName);
+    }
+    $this->setConfiguration('former_name', $this->getName());
+    
   }
 
   // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
   public function postSave() {
     //     les commandes générales
     $this->createCMDFromArray(weenect::W_CMD_common);
-    $this->update_coordinate();
+    $this->update_coordinate(self::W_CMD_common['coord']);
+
+    $this->updateCurrentZone();
+    
   }
 
   // Fonction exécutée automatiquement avant la suppression de l'équipement
   public function preRemove() {
+    // remove linked zones
+    log::add(__CLASS__, "debug", "║  ╠════════════════ preRemove equipement, remove  zones at first :");
+    $eqLogics = weenect_zone::byTracker($this->getLogicalId());
+    log::add(__CLASS__, "debug", "║  ╠════════════════ nb to remove: ".count($eqLogics));
+    foreach ($eqLogics as $eqLogic){
+      log::add(__CLASS__, "debug", "║ ╟─── remove zone :".$eqLogic->getId()." / ".$eqLogic->getHumanName());
+      $eqLogic->remove();
+    }
   }
+  
 
   // Fonction exécutée automatiquement après la suppression de l'équipement
   public function postRemove() {
   }
 
-  public function update_coordinate(){
-    log::add(__CLASS__, 'debug', "║ ╟───────────── update coordinates ");
-    $wCMD = $this->getCmd(null, "coord");
-    if (!is_object($wCMD)){
-      $this->createCMDFromArray([weenect::W_CMD_common['coord']]);
-    }
-    $latCMD = $this->getCmd(null, "latitude");
-    $longCMD = $this->getCmd(null, "longitude");
-    if(is_object($latCMD) && is_object($longCMD)){
-      $coord = $latCMD->execCmd() . "," . $longCMD->execCmd();
-      $wCMD->event($coord);
-      $wCMD->save();
-    }
+
+
+
+  public function updateCurrentZone(){
+      log::add(__CLASS__, 'debug', '║  ╠════════════════ updateCurrentZone' );
+      // calcul des distance pour zone 
+      $cmd = $this->getCmd(null, 'coord');
+      $tPos = (is_object($cmd)?$cmd->execCmd():null);
+      if(!$tPos){
+        log::add(__CLASS__, 'debug', 'Error : current position not set');
+      }
+      $tRadCmd =  $this->getCmd(null, 'radius');
+      $tRad = (is_object($tRadCmd)?$tRadCmd->execCmd():0);
+
+      $zones = weenect_zone::byTracker($this->getLogicalId());
+      log::add(__CLASS__, 'debug', 'tracker calc - # pos :'.$tPos." radius : ".$tRad );
+      foreach ($zones as $zone){
+          $zCmd= $zone->getCmd(null, 'coord');
+          $zPos = (is_object($zCmd)?$zCmd->execCmd():null);
+          if(!$zPos)continue;
+          $zRadCmd =  $zone->getCmd(null, 'distance');
+          $zRad = (is_object($zRadCmd)?$zRadCmd->execCmd():0);
+          $dist = self::distance($tPos, $zPos);
+          $rad =  $tRad +$zRad;
+          log::add(__CLASS__, 'debug', 'dist calc - '.$zone->getName()." # pos :".$zPos." radius : ".$zRad );
+          log::add(__CLASS__, 'debug', 'dist = '.$dist);
+          if($rad>= $dist){
+            $zIdcmd =$this->getCmd(null, 'curr_zone_id');
+            if(is_object($zIdcmd))$zIdcmd->event($zone->getLogicalId());
+            $zNamecmd =$this->getCmd(null, 'curr_zone_name');
+            if(is_object($zNamecmd))$zNamecmd->event($zone->getName());
+            return;
+          }
+      }
+      $zIdcmd =$this->getCmd(null, 'curr_zone_id');
+      if(is_object($zIdcmd))$zIdcmd->event(0);
+      $zNamecmd =$this->getCmd(null, 'curr_zone_name');
+      if(is_object($zNamecmd))$zNamecmd->event(null);
   }
-//   /*    ----- fonction pour mettre à jour les valeurs à partir d'un array 
-//       * dont les clé sont les logicalId des commandes (cf les array de classe)
-//       * contenant la clé status => 200 Ok si on doit remplir les données
-//   */
-//   public function updateCMDfromArray($data){
-//     log::add(__CLASS__, 'debug', "║ ╟───────────── update commands :".json_encode($data));
-//     foreach($data as $logId => $val){
-//       log::add(__CLASS__, 'debug', "║ ╟─── commands :".$logId);
-//         if($logId=='status')continue;
-//         $wCMD = $this->getCmd(null, $logId);
-//         if (is_object($wCMD)) {
-//           log::add(__CLASS__, 'debug', "║ ║ ╟─ update commande $logId to $val");
-//           $wCMD->event($val);
-//           $wCMD->save();
-//         }
-//     }
-//   }
-//   public function updateCONFfromArray($data, $conf_array){
-//     log::add(__CLASS__, 'debug', "║ ╟───────────── update configuration :".json_encode($data));
-//     log::add(__CLASS__, 'debug', "║ ╟───────────── in  :".json_encode($conf_array));
-//     foreach($conf_array as $logId => $conf){
-//       log::add(__CLASS__, 'debug', "║ ║ ╟─ try find conf $logId (".array_key_exists($logId, $data).")");
-//       if(array_key_exists($logId, $data)){
-//         $conf_value = weenect::format_output($data[$logId], $conf['type']);
-//         log::add(__CLASS__, 'debug', "║ ║ ╟─ update configuration $logId to $conf_value");
-//         $this->setConfiguration($logId, $conf_value);
-//       }
-//     }
-//     $this->save();
-//   }
-//   /*    ----- fonction pour créer les commande à partir des array de définition de la classe 
-//      * dont les clé sont les logicalId des commandes
-//      * contenant les données name, type et subtype
-//  */
-//  public function createCMDFromArray($arrayCMD){
-//    foreach($arrayCMD as $logId => $setting){
-//       $wCMD = $this->getCmd(null, $logId);
-//       if (!is_object($wCMD)) {
-//         $wCMD = new weenectCmd();
-//         $wCMD->setLogicalId($logId);
-//         $wCMD->setIsVisible(1);
-//         $wCMD->setName(__($setting['name'], __FILE__));
-//         log::add(__CLASS__, 'debug', "╟─ creation de la commande : ".$setting['name']." - $logId  de type : ".$setting['type'].'|'.$setting['subtype']);
-//       }
-//       $wCMD->setType($setting['type']);
-//       $wCMD->setSubType($setting['subtype']);
-//       $wCMD->setEqLogic_id($this->getId());
-//       $wCMD->save();
-//     }
-//  }
-
-
 
   /*
   * Permet de crypter/décrypter automatiquement des champs de configuration des équipements
@@ -442,31 +418,14 @@ class weenect extends weenect_base {
 }
 
 class weenectCmd extends cmd {
-  /*     * *************************Attributs****************************** */
-
-  /*
-  public static $_widgetPossibility = array();
-  */
-
-  /*     * ***********************Methode static*************************** */
-
-
-  /*     * *********************Methode d'instance************************* */
-
-  /*
-  * Permet d'empêcher la suppression des commandes même si elles ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
-  public function dontRemoveCmd() {
-    return true;
-  }
-  */
 
   // Exécution d'une commande
   public function execute($_options = array()) {
     log::add('weenect','debug', "╔═══════════════════════ execute CMD : ".$this->getId()." | ".$this->getHumanName().", logical id : ".$this->getLogicalId() ."  options : ".print_r($_options));
     log::add('weenect','debug', '╠════ Eq logic '.$this->getEqLogic()->getHumanName());
     switch($this->getLogicalId()){
-      case 'refresh':
-         weenect::update_position();
+      case 'update':
+        weenect::update_position();
         break;
       default:
         log::add('weenect','debug', '╠════ Default call');
@@ -475,5 +434,4 @@ class weenectCmd extends cmd {
    log::add('weenect','debug', "╚═════════════════════════════════════════ END execute CMD ");
   }
 
-  /*     * **********************Getteur Setteur*************************** */
 }
