@@ -110,4 +110,11 @@ if (!isConnect()) {
 
 </form>
 
-<?php include_file('desktop', 'weenect_conf', 'js', 'weenect'); ?>
+<?php 
+
+$weenectJS=version_compare(jeedom::version(), '4.4.0', '<')?'weenect_conf_4.3':'weenect_conf_4.4';
+log::add("weenect", 'debug','weenect conf - Load JS :'.$weenectJS);
+include_file('desktop', $weenectJS, 'js', 'weenect');
+
+include_file('desktop', 'weenect_conf', 'js', 'weenect'); 
+?>

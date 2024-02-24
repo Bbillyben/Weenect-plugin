@@ -154,7 +154,7 @@ $confList = weenect_zone::WZ_CONF_common;
 include_file('desktop', 'weenect', 'js', 'weenect'); 
 if(version_compare(jeedom::version(), '4.4.0', '<')){
 	log::add("weenect", 'debug','weenect zone - Load JS : 4.3');
-	include_file('desktop', "weenect_4.3", 'js', 'weenect'); 
+	include_file('desktop', "weenect_zone_4.3", 'js', 'weenect'); 
 }
 ?>
 <!-- Inclusion du fichier javascript du core - NE PAS MODIFIER NI SUPPRIMER -->

@@ -213,6 +213,9 @@ $confList = weenect::W_CONF_common;
 
 <!-- Inclusion du fichier javascript du plugin (dossier, nom_du_fichier, extension_du_fichier, id_du_plugin) -->
 <?php 
+$weenectJS=version_compare(jeedom::version(), '4.4.0', '<')?'weenect_4.3':'weenect_4.4';
+log::add("weenect", 'debug','weenect - Load JS :'.$weenectJS);
+include_file('desktop', $weenectJS, 'js', 'weenect');
 
 include_file('desktop', 'weenect', 'js', 'weenect');
 ?>
