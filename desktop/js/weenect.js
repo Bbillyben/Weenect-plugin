@@ -92,56 +92,18 @@ function addCmdToTable(_cmd) {
 /**-----  hook du print de l'équipement pour récupérer les zones correspondantes et les afficher dans l'onglet zones.
 */
 function printEqLogic(_eqLogic) {
-  console.log(" Print EqType : "+JSON.stringify(_eqLogic.name));
     if(_eqLogic.eqType_name =="weenect"){
       weenect_load_zones(_eqLogic);
     }else if(_eqLogic.eqType_name =="weenect_zone"){
       bind_weenect_back(_eqLogic);
     }
 }
-/**-----  appel ajax pour récupération des zone du tracker
- * _eqLogic : json de l'eqlogic en cours d'impression
-*/
-function weenect_load_zones(_eqLogic){
-  $.ajax({
-    type: "POST", 
-    url: "plugins/weenect/core/ajax/weenect.ajax.php", 
-    data: {
-        action: "load_zone", 
-        eqlogic: _eqLogic,
-    },
-    dataType: 'json',
-    error: function (request, status, error) {
-        handleAjaxError(request, status, error);
-        $("#zone_container").html(
-          "Error Loading Zones"
-        );
-    },
-    success: function (data) { // si l'appel a bien fonctionné
-        // console.log("success :"+JSON.stringify(data));
-        if(data.state =="error"){
-            jeedomUtils.showAlert({
-                message: "error load zone :"+data.result,
-                level: 'danger'
-              })
-              return;
-        }else{
-          $("#zone_container").html(
-            data.result
-          );
-          bind_weenect_zone();
-        }
-        
-    }
-});
-}
-
 
 /**-----  bind des card weenect_zone pour afficher l'équipement des zones au clic
  * _eqLogic : json de l'eqlogic en cours d'impression
 */
 function bind_weenect_zone(){
-  console.log("bind_weenect_zone");
+  // console.log("bind_weenect_zone");
   $("div.eqLogicThumbnailContainer div.eqLogicDisplayCardSecondary").click(function(){
     var tId = getUrlVars('id');
     var urlParam = new URLSearchParams(window.location.search);
@@ -158,7 +120,7 @@ function bind_weenect_zone(){
  * sur la page de l'équipement weenect_zone.
 */
 function bind_weenect_back(){
-  console.log("bind_weenect_back");
+  // console.log("bind_weenect_back");
   $("#weenect_back").unbind().click(function(e){
     e.stopPropagation();
     e.preventDefault();

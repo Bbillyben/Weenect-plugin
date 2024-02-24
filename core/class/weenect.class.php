@@ -142,7 +142,7 @@ class weenect extends weenect_base {
   */
   public static function update_all(){
     // $pos = weenect::update_position();
-    $gen = weenect::update_general();
+    $gen = weenect::update_general(TRUE);
     $cronset = weenect::setUpdateCron();
     // return $pos && $gen;
     return array("next_due_date"=>$cronset);
@@ -162,12 +162,13 @@ class weenect extends weenect_base {
   }
 
   /*  -----  lancement de la mise à jour des positions de toutes les information et position des tracker.
+  * $_updatePos : si on souhaite mettre à jours les positions en même temps que les infos
   */
-  public static function update_general(){
+  public static function update_general($_updatePos = TRUE){
     $general = weenect::get_api_data('get_account_datas');
     foreach($general['result']['items'] as $tracker){
       log::add('weenect', 'debug', "║ ╠════════════════ update Configuration tracker : ".json_encode( $tracker));
-      weenect::update_general_tracker($tracker, TRUE);
+      weenect::update_general_tracker($tracker, $_updatePos);
     }
     return True;
   }
@@ -270,7 +271,9 @@ class weenect extends weenect_base {
   */
 
   public static function setUpdateCron()
-	{ // called by ajax in config
+	{ 
+    
+    // called by ajax in config
 		log::add(__CLASS__, 'debug', "║  ╠════════════════ update cron called");
 
 		// get frequency from config
@@ -304,6 +307,13 @@ class weenect extends weenect_base {
     return self::getDueDateStr($freq);
 
 	}
+
+  /**  ----- Mis à des information générales.
+  * toutes les 15 minutes
+  */
+  public static function cron15() {
+    self::update_general(FALSE);
+  }
   /**  ----- utilitaire pour construire un array avec les dates du prochain lancement du cron.
   * $freq : définition du cron
   * retourne une string avec les information de date des dernier et prochain appel
