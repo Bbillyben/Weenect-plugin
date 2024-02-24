@@ -15,6 +15,11 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* classe principale du plugin Weenect
+représente les données directe du tracker
+récupérées par les appels API
+*/
+
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/weenect_base.class.php';
@@ -22,11 +27,10 @@ require_once __DIR__  . '/weenect_zone.class.php';
 require_once __DIR__  . '/W_API.class.php';
 
 class weenect extends weenect_base {
-  const DEFAULT_CRON = "*/30 * * * *";
-  // définition des commandes
+  const DEFAULT_CRON = "*/30 * * * *";// CRON par défaut pour les appels aux update de position - configurable dans le plugin
+  // tableaux des commandes
   const W_CMD_common = array(
-      // => en configuration 'tracker_id'=>array('name'=>'Tracker Id','type'=>'info', 'subtype'=>'string'),
-      'type'=>array('name'=>'type','type'=>'info', 'subtype'=>'string'),
+      'type'=>array('name'=>'type','type'=>'info', 'subtype'=>'string'), 
       'date_tracker'=>array('name'=>'dernière date','type'=>'info', 'subtype'=>'string'),
       
       // metrics 
@@ -58,18 +62,21 @@ class weenect extends weenect_base {
       'curr_zone_name'=>array('name'=>'Nom Zone Courante','type'=>'info', 'subtype'=>'string'),
 
   );
+  //tableau des configuration
   const W_CONF_common = array(
     'tracker_id'=>array('name'=>'Tracker id', 'info'=>'Id du tracker', 'type'=>'string'),
     'creation_date'=>array('name'=>'Date Creation', 'type'=>'date'),
-    // 'expiration_date'=>array('name'=>'Date Expiration', 'type'=>'date' , 'info'=>'Date d\'expiration de l\'abonnement'),
     'warranty_end'=>array('name'=>'Date de Garantie', 'type'=>'date', 'info'=>'Date de fin de garantie du tracker'),
     'related_zones'=>array('name'=>'Zones', 'info'=>'Zones attaché au trackers', 'hidden'=>true),
     'former_name'=>array('name'=>'former name', 'info'=>'ancien nom equipement', 'hidden'=>true),
   );
 
-  /* --------------------------------------------------------------------------------
-  ------------------------------   Util calcul distance  --------------------------
-  ---------------------------------------------------------------------------------- */
+  /*  -----  utilisataire de calcul de distance entre deux points
+  * selon la méthode de calcul Haversine http://villemin.gerard.free.fr/aGeograp/Distance.htm
+  * retourne une distance en mètre
+  * $_a : String : premier point 'latitude,longitude'
+  * $_b : String : second point 'latitude,longitude'
+  */
   public static function distance($_a, $_b) {
       $a = explode(',', $_a);
       $b = explode(',', $_b);
@@ -87,8 +94,13 @@ class weenect extends weenect_base {
   /* --------------------------------------------------------------------------------
   ------------------------------   Fonction de mise à jour --------------------------
   ---------------------------------------------------------------------------------- */
-  // get data from appi where only token is required
-  // handle the update of the token
+  /*  -----  utilisataire pour les appels aux commande de l'API
+  * permet de gérer le renouvellement du Token si une réponse revenait négative
+  * selon la méthode de calcul Haversine http://villemin.gerard.free.fr/aGeograp/Distance.htm
+  * retourne une distance en mètre
+  * $api_cmd : la command API , fonction static de la class W_API, qui ne demande que le toke
+  * retourne le résultat de la commande, array [status, header, result]
+  */
   public function get_api_data($api_cmd){
     log::add(__CLASS__, 'debug', '║ ╟─── Task for api data :'.$api_cmd);
     $token = config::byKey('token', __CLASS__);
@@ -108,8 +120,9 @@ class weenect extends weenect_base {
     }
     return $datas;
   }
-  // mise à jour du token
-  // enregistrement du nouveau token dans la config de l'équipement pour usage ultérieur
+  /*  -----  utilisataire pour renouveller le toker
+  * mise à jour de la configuration du plugin avec le toke,n
+  */
   public static function update_token(){
     log::add(__CLASS__, 'debug', '║ ╟─── renew token ....');
     $uname =  config::byKey('username', __CLASS__);
@@ -124,9 +137,9 @@ class weenect extends weenect_base {
     config::save('token',$token, __CLASS__);
     return $token;
   }
-  // ==========================
-  // Update all eqLogic from data
-  // update both position and informations
+  /*  -----  lancement de la mise à jour de toutes les informations, data et position.
+  * permet de gérer le renouvellement du Token si une réponse revenait négative
+  */
   public static function update_all(){
     // $pos = weenect::update_position();
     $gen = weenect::update_general();
@@ -136,7 +149,8 @@ class weenect extends weenect_base {
   }
 
 
-  //update position of trackers
+  /*  -----  lancement de la mise à jour des positions de tous les tracker.
+  */
   public static function update_position(){
     $datas = weenect::get_api_data('get_tracker_position');
     log::add('weenect', 'debug', "║ ╠════════════════ position data : ".json_encode( $datas));
@@ -147,7 +161,8 @@ class weenect extends weenect_base {
     return True;
   }
 
-  // update datas other than positions
+  /*  -----  lancement de la mise à jour des positions de toutes les information et position des tracker.
+  */
   public static function update_general(){
     $general = weenect::get_api_data('get_account_datas');
     foreach($general['result']['items'] as $tracker){
@@ -157,8 +172,10 @@ class weenect extends weenect_base {
     return True;
   }
 
-  // mise à jour du tracker en fonction de son id
-  // si auncun trouver en créé un nouveau
+  /*  ----- Mis à jours des positions d'un tracker particulier
+  * création d'un nouveau tracker si son id (weenect) est inconnnu
+  * $datas : array des données du tracker.
+  */
   public static function update_tracker($datas){
     $tId = $datas['tracker_id'];
     log::add('weenect', 'debug', "║ ╠════════════════ update tracker Position : ".$tId);
@@ -173,7 +190,11 @@ class weenect extends weenect_base {
     $eqLogic->updateCurrentZone();
     log::add('weenect', 'debug', "║ ╠════════════════ End update tracker ");
   }
-
+  /*  ----- Mis à jours des données générales d'un tracker, voire des positions également
+  * création d'un nouveau tracker si son id (weenect) est inconnnu
+  * $datas : array des données du tracker.
+  * $update_position : mis à jour des position également (retournée dans le même appel à l'api...)
+  */
   public static function update_general_tracker($datas, $update_position = False){
     $tId = $datas['id'];
     log::add('weenect', 'debug', "║ ╠════════════════ update General tracker  : ".$tId);
@@ -202,6 +223,11 @@ class weenect extends weenect_base {
     log::add('weenect', 'debug', "║ ╠════════════════ End update General tracker ");
   }
 
+  /*  ----- Création d'un nouveau tracker
+  * récupère le nom via un appel API
+  * création d'un nouveau tracker si son id (weenect) est inconnnu
+  * $idTracker : id weenect du tracker, qui sera l'idlogic de l'eqlogic
+  */
   public static function create_new_tracker($idTracker){
     log::add(__CLASS__, 'debug', "║ ╟─── create a new tracker $idTracker");
     
@@ -236,8 +262,13 @@ class weenect extends weenect_base {
   /* -----------------------------------------------------------------------
   ------------------------------   Fonction CRON  --------------------------
   ------------------------------------------------------------------------- */
-  /** Function setUpdateCron : called when by ajax on configuraiton save
-	 * to update position of trackers  */
+  /**  ----- Mis à jour/en place des appel cron.
+  * ajoute/modifie une entrée dans le moteur des taches de jeedom
+  * selon la configuration du plugin
+  * lancé lors de l'appel ajax au save de la configuration.
+  * retourne une string avec les information de date des dernier et prochain appel
+  */
+
   public static function setUpdateCron()
 	{ // called by ajax in config
 		log::add(__CLASS__, 'debug', "║  ╠════════════════ update cron called");
@@ -273,8 +304,11 @@ class weenect extends weenect_base {
     return self::getDueDateStr($freq);
 
 	}
-  /** Function getDueDateStr : called when by getDueDate (ajax on configuration save) to get string from due date of cron job */
-	public static function getDueDateStr($freq)
+  /**  ----- utilitaire pour construire un array avec les dates du prochain lancement du cron.
+  * $freq : définition du cron
+  * retourne une string avec les information de date des dernier et prochain appel
+  */
+  public static function getDueDateStr($freq)
 	{
 		$c = new Cron\CronExpression(checkAndFixCron($freq), new Cron\FieldFactory);
 		$calculatedDate = array('prevDate' => '', 'nextDate' => '');
@@ -283,51 +317,16 @@ class weenect extends weenect_base {
 		return $calculatedDate;
 	}
 
-  /*     * *************************Attributs****************************** */
-
-  /*
-  * Permet de définir les possibilités de personnalisation du widget (en cas d'utilisation de la fonction 'toHtml' par exemple)
-  * Tableau multidimensionnel - exemple: array('custom' => true, 'custom::layout' => false)
-  public static $_widgetPossibility = array();
-  */
-
-  /*
-  * Permet de crypter/décrypter automatiquement des champs de configuration du plugin
-  * Exemple : "param1" & "param2" seront cryptés mais pas "param3"
-  public static $_encryptConfigKey = array('param1', 'param2');
-  */
-  // public static $_encryptConfigKey = array( 'token');
-
-  /*     * ***********************Methode static*************************** */
-
-
-  /*     * *********************Méthodes d'instance************************* */
-
-  // Fonction exécutée automatiquement avant la création de l'équipement
-  public function preInsert() {
-  }
-
-  // Fonction exécutée automatiquement après la création de l'équipement
-  public function postInsert() {
-  }
-
-  // Fonction exécutée automatiquement avant la mise à jour de l'équipement
-  public function preUpdate() {
-  }
-
-  // Fonction exécutée automatiquement après la mise à jour de l'équipement
-  public function postUpdate() {
-  }
 
   // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
   public function preSave() {
     //synchro des zones
-    $odlName= $this->getConfiguration('former_name');
+    $odlName= $this->getConfiguration('former_name');// ancien nom de l'équipement
     $zones = weenect_zone::byTracker($this->getLogicalId());
     foreach ($zones as $zone){
       $zone->updateFromTracker($this, $odlName);
     }
-    $this->setConfiguration('former_name', $this->getName());
+    $this->setConfiguration('former_name', $this->getName());// référencement du nouveau nom
     
   }
 
@@ -335,32 +334,31 @@ class weenect extends weenect_base {
   public function postSave() {
     //     les commandes générales
     $this->createCMDFromArray(weenect::W_CMD_common);
+    // mise à jour de la commande coord : String latitude,longitude
     $this->update_coordinate(self::W_CMD_common['coord']);
-
+    // mise à jour de la position du tracker dans une zone
     $this->updateCurrentZone();
     
   }
 
   // Fonction exécutée automatiquement avant la suppression de l'équipement
   public function preRemove() {
-    // remove linked zones
-    log::add(__CLASS__, "debug", "║  ╠════════════════ preRemove equipement, remove  zones at first :");
+    // Suppresion des zones liées au tracker, p^par idLogic du tracker
+    log::add(__CLASS__, "debug", "║  ╠════════════════ preRemove equipement, remove  zones at first");
     $eqLogics = weenect_zone::byTracker($this->getLogicalId());
-    log::add(__CLASS__, "debug", "║  ╠════════════════ nb to remove: ".count($eqLogics));
     foreach ($eqLogics as $eqLogic){
       log::add(__CLASS__, "debug", "║ ╟─── remove zone :".$eqLogic->getId()." / ".$eqLogic->getHumanName());
       $eqLogic->remove();
     }
   }
-  
-
-  // Fonction exécutée automatiquement après la suppression de l'équipement
-  public function postRemove() {
-  }
 
 
-
-
+  /**  ----- mise à jour de la zone occupé par le tracker
+  * met à jour les commande 'curr_zone_id' (idLogic de la zone en cours) et 'curr_zone_name' (nom de la zone en cours)
+  * met à 0 les deux commande si aucune zone n'est occupé
+  * si dist tracker<->zone <= radius Tracker + distance Zone
+  * met à jour la commande 'is_in' de chacune des zone
+  */
   public function updateCurrentZone(){
       log::add(__CLASS__, 'debug', '║  ╠════════════════ updateCurrentZone' );
       // calcul des distance pour zone 
@@ -378,7 +376,10 @@ class weenect extends weenect_base {
           $zCmd= $zone->getCmd(null, 'coord');
           $zPos = (is_object($zCmd)?$zCmd->execCmd():null);
           if(!$zPos)continue;
+
           $zRadCmd =  $zone->getCmd(null, 'distance');
+          $in = $zone->getCmd(null, 'is_in');
+
           $zRad = (is_object($zRadCmd)?$zRadCmd->execCmd():0);
           $dist = self::distance($tPos, $zPos);
           $rad =  $tRad +$zRad;
@@ -389,7 +390,10 @@ class weenect extends weenect_base {
             if(is_object($zIdcmd))$zIdcmd->event($zone->getLogicalId());
             $zNamecmd =$this->getCmd(null, 'curr_zone_name');
             if(is_object($zNamecmd))$zNamecmd->event($zone->getName());
-            return;
+            if(is_object($in))$in->event(1);
+            
+          }else{
+            if(is_object($in))$in->event(0);
           }
       }
       $zIdcmd =$this->getCmd(null, 'curr_zone_id');
@@ -397,24 +401,6 @@ class weenect extends weenect_base {
       $zNamecmd =$this->getCmd(null, 'curr_zone_name');
       if(is_object($zNamecmd))$zNamecmd->event(null);
   }
-
-  /*
-  * Permet de crypter/décrypter automatiquement des champs de configuration des équipements
-  * Exemple avec le champ "Mot de passe" (password)
-  public function decrypt() {
-    $this->setConfiguration('password', utils::decrypt($this->getConfiguration('password')));
-  }
-  public function encrypt() {
-    $this->setConfiguration('password', utils::encrypt($this->getConfiguration('password')));
-  }
-  */
-
-  /*
-  * Permet de modifier l'affichage du widget (également utilisable par les commandes)
-  public function toHtml($_version = 'dashboard') {}
-  */
-
-  /*     * **********************Getteur Setteur*************************** */
 }
 
 class weenectCmd extends cmd {
@@ -425,6 +411,7 @@ class weenectCmd extends cmd {
     log::add('weenect','debug', '╠════ Eq logic '.$this->getEqLogic()->getHumanName());
     switch($this->getLogicalId()){
       case 'update':
+        // demande la mise à jour de toutes les position des trackers.
         weenect::update_position();
         break;
       default:

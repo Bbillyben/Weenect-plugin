@@ -1,4 +1,9 @@
-// show hide password button
+/* Javascript load in weenect plugin conf page
+*/
+
+
+/**-----  bind des évènement pour le bouton afficher/masquer le mot de passe
+*/
 $("#bt_show_pass").on('mousedown', function(){
     $("input[data-l1key='password']").attr('type', 'text');
     $(this).find("i").removeClass('fa-eye').addClass('fa-eye-slash')
@@ -9,7 +14,8 @@ $("#bt_show_pass").on('mouseup mouseleave', function(){
     $(this).find("i").removeClass('fa-eye-slash').addClass('fa-eye')
 })
 
-// hide la programmation du cron.
+/**-----  bind des évènement pour l'affichage du cron personnalisé selon la configuiration du dropdown
+*/
 $("#freq_selector").on('change', function () {
     // console.log("freq_selector change :"+$(this).val() );
     if($(this).val() != 'prog'){
@@ -24,18 +30,22 @@ $("#freq_selector").on('change', function () {
     }
   });
 
-  function check_token_status(){
-    // console.log("check_token_status :"+$("input[data-l1key='token']").val() );
-    if($("input[data-l1key='token']").val()!= ""){
-      $("#token_status").html('<i class="fa fa-check" style="color:green;"></i>');
-    }else{
-      $("#token_status").html('<i class="fa fa-x" style="color:red;">X</i>');
-    }
-    
+/**-----  vérifie si le token est renseigné dans l'input de la configuration (masqué)
+*/
+function check_token_status(){
+  // console.log("check_token_status :"+$("input[data-l1key='token']").val() );
+  if($("input[data-l1key='token']").val()!= ""){
+    $("#token_status").html('<i class="fa fa-check" style="color:green;"></i>');
+  }else{
+    $("#token_status").html('<i class="fa fa-x" style="color:red;">X</i>');
+  }
+  
   }
 
 
-  // refresh du token manually
+/**-----  bind de l'évent sur le bouton pour lancer la requete de login via l'api pour récupération du token.
+ * via appel ajax
+*/
   $("#bt_get_token").on('click', function(){
     var uname = $('.configKey[data-l1key="username"]').val();
     var pass = $('.configKey[data-l1key="password"]').val();
@@ -85,9 +95,9 @@ $("#freq_selector").on('change', function () {
     check_token_status();
   });
  
-
-  // post save ajax call 
-  // => to launch the update and create eqLogic
+  /**-----  bhook du post save pour mettre à jour ou créer les équipementn tracker et zone
+ * via appel ajax
+  */
   function weenect_postSaveConfiguration() {
     console.log("weenect_postSaveConfiguration call");
     $.ajax({

@@ -14,6 +14,9 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* Javascript load in weenect and weenect_zone equipement page
+*/
+
 /* Permet la réorganisation des commandes dans l'équipement */
 $("#table_cmd").sortable({
   axis: "y",
@@ -84,30 +87,60 @@ function addCmdToTable(_cmd) {
       jeedom.cmd.changeType(tr, init(_cmd.subType))
     }
   })
-  // bind_weenect_zone();
-  // bind_weenect_back();
+
 }
-
-
-// $(document).ready(function(){
-  
-//   // click sur les zone dans l'equipement du tracker
-//   bind_weenect_zone();
-//   // for the back in weenect_zone
-//   bind_weenect_back();
-
-// })
-
+/**-----  hook du print de l'équipement pour récupérer les zones correspondantes et les afficher dans l'onglet zones.
+*/
 function printEqLogic(_eqLogic) {
-  console.log(_eqLogic);
     if(_eqLogic.eqType_name =="weenect"){
-      bind_weenect_zone();
+      weenect_load_zones(_eqLogic);
     }else if(_eqLogic.eqType_name =="weenect_zone"){
-      bind_weenect_back();
+      bind_weenect_back(_eqLogic);
     }
 }
+/**-----  appel ajax pour récupération des zone du tracker
+ * _eqLogic : json de l'eqlogic en cours d'impression
+*/
+function weenect_load_zones(_eqLogic){
+  $.ajax({
+    type: "POST", 
+    url: "plugins/weenect/core/ajax/weenect.ajax.php", 
+    data: {
+        action: "load_zone", 
+        eqlogic: _eqLogic,
+    },
+    dataType: 'json',
+    error: function (request, status, error) {
+        handleAjaxError(request, status, error);
+        $("#zone_container").html(
+          "Error Loading Zones"
+        );
+    },
+    success: function (data) { // si l'appel a bien fonctionné
+        // console.log("success :"+JSON.stringify(data));
+        if(data.state =="error"){
+            jeedomUtils.showAlert({
+                message: "error load zone :"+data.result,
+                level: 'danger'
+              })
+              return;
+        }else{
+          $("#zone_container").html(
+            data.result
+          );
+          bind_weenect_zone();
+        }
+        
+    }
+});
+}
+
+
+/**-----  bind des card weenect_zone pour afficher l'équipement des zones au clic
+ * _eqLogic : json de l'eqlogic en cours d'impression
+*/
 function bind_weenect_zone(){
-  console.log("bind_weenect_zone");
+  // console.log("bind_weenect_zone");
   $("div.eqLogicThumbnailContainer div.eqLogicDisplayCardSecondary").click(function(){
     var tId = getUrlVars('id');
     var urlParam = new URLSearchParams(window.location.search);
@@ -115,21 +148,26 @@ function bind_weenect_zone(){
     urlParam.set('id',  $(this).attr('data-eqLogic_id'));
     urlParam.set('tracker',  tId);
     var urlNav = window.location.href.split('?')[0] + '?' + urlParam.toString();
-    console.log(" Zone URL :"+urlNav);
+    // console.log(" Zone URL :"+urlNav);
     jeedomUtils.loadPage(urlNav);
   });
 }
 
+/**-----  bind du bouton retour dans l'équipement des zones pour revenir sur l'équipement tracker correspondant
+ * sur la page de l'équipement weenect_zone.
+*/
 function bind_weenect_back(){
-  console.log("bind_weenect_back");
-  $("#weenect_back").unbind().click(function(){
+  // console.log("bind_weenect_back");
+  $("#weenect_back").unbind().click(function(e){
+    e.stopPropagation();
+    e.preventDefault();
     var tId = getUrlVars('tracker');
     var urlParam = new URLSearchParams(window.location.search);
     urlParam.set('p', "weenect");
     urlParam.set('id',  tId);
     urlParam.delete('tracker');
     var urlNav = window.location.href.split('?')[0] + '?' + urlParam.toString()+"#zonetab";
-    console.log("back url :"+urlNav);
+    // console.log("back url :"+urlNav);
     jeedomUtils.loadPage(urlNav);
   });
 }

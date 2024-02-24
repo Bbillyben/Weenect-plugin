@@ -1,3 +1,5 @@
+/* Load in weenect equipement page */
+/* for the back arrow in weenect_zone */
 div.eqLogicThumbnailContainer .eqLogicDisplayCardSecondary.cursor.displayAsTable:last-child
 {
   margin-bottom: 13px !important;
@@ -72,4 +74,20 @@ div.eqLogicThumbnailContainer .card img
 div.eqLogicThumbnailContainer .card
 {
   margin-left:1em;
+}
+
+/* for zone miniature */
+.eqLogicDisplayCardSecondary .icon_cont .tracker_in{
+  color:var(--al-success-color);
+  opacity: 1 !important;
+}
+.eqLogicDisplayCardSecondary .icon_cont .tracker_out{
+  opacity: 0.5 !important;
+  color:unset;
+}
+.eqLogicDisplayCardSecondary .icon_cont > i{
+  margin-right:0.3em;
+}
+.eqLogicDisplayCardSecondary .icon_cont > i:last-child{
+  margin-right:0;
 }

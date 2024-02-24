@@ -19,6 +19,7 @@ try {
     require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
     require_once dirname(__FILE__) . '/../class/W_API.class.php';
     require_once dirname(__FILE__) . '/../class/weenect.class.php';
+    require_once dirname(__FILE__) . '/../class/weenect_zone.class.php';
     include_file('core', 'authentification', 'php');
 
     if (!isConnect('admin')) {
@@ -33,15 +34,11 @@ try {
 
     log::add('weenect','debug','╔═══ #################### AJAX action required :'.init('action'));
 
-
+    // refresh du token via l'api bde login
     if(init('action') == "refresh_token"){
       $uname = init('username');
       $pass = init('password');
-
-      log::add('weenect', 'debug', '║ ╟─── username :'.$uname);
-      log::add('weenect', 'debug', '║ ╟─── username :'.$pass);
       $result =W_API::get_token($uname, $pass);
-      log::add('weenect', 'debug', '║ ╟─── ajax result :'.$result);
       ajax::success($result);
     }
     // update des données
@@ -49,6 +46,15 @@ try {
       $result = weenect::update_all();
       ajax::success($result);
     }
+
+    if(init('action') == "load_zone"){
+      $tracker=init('eqlogic');
+      $trackerId = $tracker['logicalId'];
+      $result = weenect_zone::get_zone_html($trackerId);
+      ajax::success($result);
+    }
+
+
     
     throw new Exception(__('Aucune méthode correspondante à', __FILE__) . ' : ' . init('action'));
     /*     * *********Catch exeption*************** */

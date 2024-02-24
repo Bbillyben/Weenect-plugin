@@ -1,0 +1,32 @@
+/* Load in weenect_zone equipement page */
+/* for the back arrow in weenect_zone */
+#weenect_back {
+    display: block;
+    position: relative;
+  
+    border-radius: var(--border-radius) 0 0 0 !important;
+    padding: 10px 14px;
+    z-index: 3;
+    border: 1px solid transparent ;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: transparent;
+    border-bottom-color: rgba(var(--panel-bg-color), var(--opacity)) ;
+    font-size: 14px;
+    margin-right: 0 !important;
+    border-top: none !important;
+  
+    line-height: 1.42857143;
+  }
+  #weenect_back:focus, #weenect_back:hover {
+    text-decoration: none;
+    background-color: rgba(var(--panel-bg-color), var(--opacity)) !important;
+    color: var(--link-color) !important;
+    border-bottom: 1px var(--logo-primary-color) solid !important;
+    z-index: 6;
+  }
+  
+  ul.nav.nav-tabs li, .nav-tabs > li > a {
+    margin-right: 0 !important;
+    border-top: none !important;
+  }

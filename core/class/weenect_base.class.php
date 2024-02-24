@@ -39,7 +39,7 @@ class weenect_base extends eqLogic {
         $wCMD = $this->getCmd(null, $logId);
         $isOk=true;
         if (is_object($wCMD)) {
-          log::add(self::$__CUR_CLASS__, 'debug', "║ ║ ╟─ update commande $logId to $val");
+          // log::add(self::$__CUR_CLASS__, 'debug', "║ ║ ╟─ update commande $logId to $val");
           $wCMD->event($val);
           $wCMD->save();
           // $isOk = $this->checkAndUpdateCmd($wCMD->getLogicalId(),$val) && $isOk;
@@ -58,7 +58,6 @@ class weenect_base extends eqLogic {
         $this->setConfiguration($logId, $conf_value);
       }
     }
-    //$this->save();
   }
   /*    ----- fonction pour créer les commande à partir des array de définition de la classe 
      * dont les clé sont les logicalId des commandes

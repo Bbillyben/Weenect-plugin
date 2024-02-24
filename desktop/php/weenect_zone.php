@@ -1,24 +1,16 @@
 <?php
+/** Page des équipements weenect_zone, rattaché à un tracker
+ * pas de boutons nouveau,supprimer, les équipements sont gérés automatiquement selon les données de l'API
+ */
 require_once dirname(__FILE__) . '/../../core/class/weenect_zone.class.php';
 if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
-// Déclaration des variables obligatoires
-// $plugin = plugin::byId('weenect');
 sendVarToJS('eqType', "weenect_zone");
-// $urlParts = parse_url($_SERVER['REQUEST_URI']);
-// parse_str($urlParts['query'], $queryParams);
-// if (isset($queryParams['tracker'])) {
-// 	$tId = $queryParams['tracker'];
-// 	$queryParams['id'] = $tId;
-// 	$newQueryString = http_build_query($queryParams);
-// 	$newUrl = $urlParts['path'] . '?' . $newQueryString;
-// }
-// echo "<div>  TiD : ".$tId." </div>";
-// echo "<div> nex URI: ".$newUrl." </div>";
 $eqLogics = eqLogic::byType("weenect");
 $confList = weenect_zone::WZ_CONF_common;
 ?>
+<?php include_file('desktop', 'weenect_zone', 'css', 'weenect'); ?>
 
 <div class="row row-overflow">
 	
@@ -35,8 +27,8 @@ $confList = weenect_zone::WZ_CONF_common;
 			</span>
 		</div>
 		<!-- Onglets -->
-		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation"><a><i id="weenect_back" class="fas fa-arrow-circle-left"></a></i></li>
+		<ul class="nav nav-tabs" role="tablist"  >
+			<li role="presentation"><span id="weenect_back" aria-controls="home"><i class="fas fa-arrow-circle-left"></span></i></li>
 			<li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
 			<li role="presentation"><a href="#commandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i> {{Commandes}}</a></li>
 		</ul>

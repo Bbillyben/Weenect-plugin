@@ -1,4 +1,7 @@
 <?php
+/** Page des équipements weenect / tracker
+ * pas de boutons nouveau, les équipements sont créés automatiquement selon les données de l'API
+ */
 require_once dirname(__FILE__) . '/../../core/class/weenect.class.php';
 require_once dirname(__FILE__) . '/../../core/class/weenect_zone.class.php';
 if (!isConnect('admin')) {
@@ -18,11 +21,6 @@ $confList = weenect::W_CONF_common;
 		<legend><i class="fas fa-cog"></i> {{Gestion}}</legend>
 		<!-- Boutons de gestion du plugin -->
 		<div class="eqLogicThumbnailContainer">
-			<!-- <div class="cursor eqLogicAction logoPrimary" data-action="add">
-				<i class="fas fa-plus-circle"></i>
-				<br>
-				<span>{{Ajouter}}</span>
-			</div> -->
 			<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
 				<i class="fas fa-wrench"></i>
 				<br>
@@ -202,35 +200,9 @@ $confList = weenect::W_CONF_common;
 				<div class=""> {{liste des zones affiliées à l'équipement}}</div>
 				<div id="zone_list"></div>
 
-				<div class="table-responsive">
-					<?php
-					if (count($eqLogics) != 0){
-						$zoneId =  json_decode($eqLogic->getConfiguration('related_zones'));
-						$zones = weenect_zone::byTracker($eqLogic->getLogicalId());
-						// echo 'All zones id : '.$zoneId;
-						echo '<div class="eqLogicThumbnailContainer" style="display:flex;">';
-						foreach($zones as $zone ){
-							// $zone = eqlogic::byLogicalId($id, 'weenect_zone');
-							// echo "<br>zone $id exist ? :".(is_object($zone)?1:0);
-							if(!is_object($zone))continue;
-							$opacity = ($zone->getIsEnable()) ? '' : 'disableCard';
-							echo '<div class="eqLogicDisplayCardSecondary card ' . $opacity . '" data-eqLogic_id="' . $zone->getId() . '">';
-							echo '<img class="card-img-top" src="'.$plugin->getPathImgIcon().'" alt="Card image cap">';
-							
-							// echo '<br>';
-							echo '<div class="card-name">' . $zone->getHumanName(true, true) . '</div>';
-							echo '<span class=" displayTableRight">';
-							echo '<div class="card-text">{{Tracker id}} :'.$zone->getConfiguration('tracker_id').'</div>';
-							echo ($zone->getIsVisible() == 1) ? '<i class="fas fa-eye" title="{{Equipement visible}}"></i>' : '<i class="fas fa-eye-slash" title="{{Equipement non visible}}"></i>';
-							echo '</span>';
-							echo '</div>';
-
-							
-						}
-						echo '</div>';
-					}
-						
-					?>
+				<div  class="table-responsive">
+					<div id="zone_container" class="eqLogicThumbnailContainer" style="display:flex;">
+					</div>
 				</div>
 			</div><!-- /.tabpanel #zonetab-->
 
