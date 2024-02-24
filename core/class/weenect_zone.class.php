@@ -117,7 +117,7 @@ class weenect_zone extends weenect_base {
     * cherche dans eqLogic, avec eqName = "weenect_zone" 
     * retourne un array avec les eqLogic des zones trouvées
     */
-    public static function all() {
+    public static function all($_only_valid=false) {
 		$values = array(
 			'eqType_name' => __CLASS__,
 		);
