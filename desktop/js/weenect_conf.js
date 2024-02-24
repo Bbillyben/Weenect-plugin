@@ -33,7 +33,6 @@ $("#freq_selector").on('change', function () {
 /**-----  vérifie si le token est renseigné dans l'input de la configuration (masqué)
 */
 function check_token_status(){
-  console.log("check_token_status :"+$("input[data-l1key='token']").val() );
   if($("input[data-l1key='token']").val()!= ""){
     $("#token_status").html('<i class="fa fa-check" style="color:green;"></i>');
   }else{
@@ -44,7 +43,6 @@ function check_token_status(){
 
   $(document).ready(function () {
     $('.configKey[data-l1key="token"]').on('change', function(){
-      console.log(' data-l1key="token" change');
       check_token_status();
     })
   });

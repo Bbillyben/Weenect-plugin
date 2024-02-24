@@ -52,7 +52,7 @@ $("#bt_get_token").on('click', function(){
  * via appel ajax
   */
   function weenect_postSaveConfiguration() {
-    console.log("weenect_postSaveConfiguration call");
+    // console.log("weenect_postSaveConfiguration call");
     $.ajax({
       type: "POST", 
       url: "plugins/weenect/core/ajax/weenect.ajax.php", 
@@ -64,7 +64,7 @@ $("#bt_get_token").on('click', function(){
           handleAjaxError(request, status, error);
       },
       success: function (data) { // si l'appel a bien fonctionné
-          console.log(JSON.stringify(data));
+        //   console.log(JSON.stringify(data));
           if(data.state =="error" || data.result == false){
               jeedomUtils.showAlert({
                   message: data.result || "Error in Data Update",
