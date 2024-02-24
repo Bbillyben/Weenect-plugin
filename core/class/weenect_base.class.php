@@ -98,7 +98,7 @@ class weenect_base extends eqLogic {
 
 // shared by weenect and weenect zone
   public function update_coordinate($_coorDef){
-    log::add(self::$__CUR_CLASS__, 'debug', "║ ╟───────────── update coordinates ");
+    // log::add(self::$__CUR_CLASS__, 'debug', "║ ╟───────────── update coordinates ");
     $wCMD = $this->getCmd(null, "coord");
     if (!is_object($wCMD)){
       $this->createCMDFromArray([$_coorDef]);

@@ -215,7 +215,7 @@ class weenect extends weenect_base {
 
     // position update
     if($update_position){
-      log::add('weenect', 'debug', "position update datas :".json_encode($datas));
+      // log::add('weenect', 'debug', "position update datas :".json_encode($datas));
       $datas['tracker_id']=$tId;
       weenect::update_tracker($datas);
     }
@@ -371,7 +371,7 @@ class weenect extends weenect_base {
       $tRad = (is_object($tRadCmd)?$tRadCmd->execCmd():0);
 
       $zones = weenect_zone::byTracker($this->getLogicalId());
-      log::add(__CLASS__, 'debug', 'tracker calc - # pos :'.$tPos." radius : ".$tRad );
+      // log::add(__CLASS__, 'debug', 'tracker calc - # pos :'.$tPos." radius : ".$tRad );
       foreach ($zones as $zone){
           $zCmd= $zone->getCmd(null, 'coord');
           $zPos = (is_object($zCmd)?$zCmd->execCmd():null);
@@ -383,8 +383,8 @@ class weenect extends weenect_base {
           $zRad = (is_object($zRadCmd)?$zRadCmd->execCmd():0);
           $dist = self::distance($tPos, $zPos);
           $rad =  $tRad +$zRad;
-          log::add(__CLASS__, 'debug', 'dist calc - '.$zone->getName()." # pos :".$zPos." radius : ".$zRad );
-          log::add(__CLASS__, 'debug', 'dist = '.$dist);
+          // log::add(__CLASS__, 'debug', 'dist calc - '.$zone->getName()." # pos :".$zPos." radius : ".$zRad );
+          // log::add(__CLASS__, 'debug', 'dist = '.$dist);
           if($rad>= $dist){
             $zIdcmd =$this->getCmd(null, 'curr_zone_id');
             if(is_object($zIdcmd))$zIdcmd->event($zone->getLogicalId());

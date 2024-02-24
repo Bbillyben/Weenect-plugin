@@ -7,16 +7,14 @@ if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
 sendVarToJS('eqType', "weenect_zone");
-$eqLogics = eqLogic::byType("weenect");
 $confList = weenect_zone::WZ_CONF_common;
 ?>
+
 <?php include_file('desktop', 'weenect_zone', 'css', 'weenect'); ?>
 
-<div class="row row-overflow">
-	
-	
+<div class="row row-overflow">	
 	<!-- Page de présentation de l'équipement -->
-	<div class="col-xs-12 eqLogic" style="display: none;">
+	<div class="col-xs-12 eqLogic" style="">
 		<!-- barre de gestion de l'équipement -->
 		<div class="input-group pull-right" style="display:inline-flex;">
 			<span class="input-group-btn">
@@ -152,6 +150,12 @@ $confList = weenect_zone::WZ_CONF_common;
 </div><!-- /.row row-overflow -->
 
 <!-- Inclusion du fichier javascript du plugin (dossier, nom_du_fichier, extension_du_fichier, id_du_plugin) -->
-<?php include_file('desktop', 'weenect', 'js', 'weenect'); ?>
+<?php 
+include_file('desktop', 'weenect', 'js', 'weenect'); 
+if(version_compare(jeedom::version(), '4.4.0', '<')){
+	log::add("weenect", 'debug','weenect zone - Load JS : 4.3');
+	include_file('desktop', "weenect_4.3", 'js', 'weenect'); 
+}
+?>
 <!-- Inclusion du fichier javascript du core - NE PAS MODIFIER NI SUPPRIMER -->
 <?php include_file('core', 'plugin.template', 'js'); ?>
