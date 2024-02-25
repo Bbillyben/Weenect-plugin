@@ -27,18 +27,21 @@ require_once __DIR__  . '/weenect_base.class.php';
 class weenect_zone extends weenect_base {
     const WZ_CMD_common = array(
         'number'=>array('name'=>'Num','type'=>'info', 'subtype'=>'string'),
-        'address'=>array('name'=>'Adresse','type'=>'info', 'subtype'=>'string'),
+        'address'=>array( 'name'=>'Adresse','type'=>'info', 'subtype'=>'string'),
         'latitude'=>array('name'=>'Latitude','type'=>'info', 'subtype'=>'numeric'),
-        'longitude'=>array('name'=>'Longitude','type'=>'info', 'subtype'=>'numeric'),
-        'distance'=>array('name'=>'Distance','type'=>'info', 'subtype'=>'numeric'),
+        'longitude'=>array( 'name'=>'Longitude','type'=>'info', 'subtype'=>'numeric'),
+        'radius'=>array('key'=> 'distance', 'name'=>'Distance','type'=>'info', 'subtype'=>'numeric'),
         'coord'=>array('name'=>'Coordonnées','type'=>'info', 'subtype'=>'string'),
-        'is_in'=>array('name'=>'Dans la Zone','type'=>'info', 'subtype'=>'binary'),
+        'is_in'=>array( 'name'=>'Dans la Zone','type'=>'info', 'subtype'=>'binary'),
     );
 
     const WZ_CONF_common = array(
         'tracker_id'=>array('name'=>'Tracker','type'=>'info', 'subtype'=>'string'),
     );
 
+    public static function get_cmd_array(){
+        return self::WZ_CMD_common;
+    }
     public static function update_zones($eqTracker, $_zones){
         log::add("weenect", 'debug', '║ ║ ╔════════════ Zone Update :'.json_encode($zids));
         // suppression des zones inutiles

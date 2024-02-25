@@ -26,7 +26,46 @@ class weenect_base extends eqLogic {
         self::$__CUR_CLASS__='weenect'; //get_class($this);
         // parent::__construct();
     }
-
+    public static function get_cmd_array(){
+      return array();
+    }
+  /*    ----- fonction pour créer les commande à partir des array de définition de la classe 
+    * dont les clé sont les logicalId des commandes
+    * contenant les données name, type et subtype
+ */
+ public function createCMDFromArray($arrayCMD){
+  foreach($arrayCMD as $logId => $setting){
+      $wCMD = $this->getCmd(null, $logId);
+      if (!is_object($wCMD)) {
+      $wCMD = new cmd();
+      $wCMD->setLogicalId($logId);
+      $wCMD->setIsVisible(1);
+      $wCMD->setName(__($setting['name'], __FILE__));
+      log::add(self::$__CUR_CLASS__, 'debug', "╟─ creation de la commande : ".$setting['name']." - $logId  de type : ".$setting['type'].'|'.$setting['subtype']);
+      }
+      $wCMD->setType($setting['type']);
+      $wCMD->setSubType($setting['subtype']);
+      $wCMD->setEqLogic_id($this->getId());
+      $wCMD->save();
+   }
+}
+/**    ----- retourne la clé de l'array pour laquelle la valeur de $key == $logId
+ * $logId : la valeur à trouver pour
+ * $key : la clé
+ * $_default : valeur par défaut retourné sir $logId non trouvé sur $key
+ */
+  public static function getCmdLogId($logId, $_default=false, $key='key',  $arr=false){
+    if(!$arr)$arr=static::get_cmd_array();
+    $id=false;//array_search($logId, array_column($arr, $key));
+    foreach($arr as $k=>$v){
+      if(array_key_exists($key, $v) && $v[$key]==$logId){
+        $id = $k;
+        break;
+      }
+    }
+    if($id===false)return $_default;
+    return $id;
+  }
   /*    ----- fonction pour mettre à jour les valeurs à partir d'un array 
       * dont les clé sont les logicalId des commandes (cf les array de classe)
       * contenant la clé status => 200 Ok si on doit remplir les données
@@ -35,8 +74,10 @@ class weenect_base extends eqLogic {
     // log::add(self::$__CUR_CLASS__, 'debug', "║ ╟───────────── update commands :".json_encode($data));
     foreach($data as $logId => $val){
       // log::add(self::$__CUR_CLASS__, 'debug', "║ ╟─── commands :".$logId);
-        if($logId=='status')continue;
-        $wCMD = $this->getCmd(null, $logId);
+        $cmdlogId = self::getCmdLogId($logId, $logId);// array_search($logId, array_column(static::get_cmd_array(), 'key'));
+        
+        // log::add(self::$__CUR_CLASS__, 'debug', 'from array :'.json_encode(static::get_cmd_array()));
+        $wCMD = $this->getCmd(null, $cmdlogId);
         $isOk=true;
         if (is_object($wCMD)) {
           // log::add(self::$__CUR_CLASS__, 'debug', "║ ║ ╟─ update commande $logId to $val");
@@ -59,27 +100,6 @@ class weenect_base extends eqLogic {
       }
     }
   }
-  /*    ----- fonction pour créer les commande à partir des array de définition de la classe 
-     * dont les clé sont les logicalId des commandes
-     * contenant les données name, type et subtype
- */
- public function createCMDFromArray($arrayCMD){
-   foreach($arrayCMD as $logId => $setting){
-      $wCMD = $this->getCmd(null, $logId);
-      if (!is_object($wCMD)) {
-        $wCMD = new cmd();
-        $wCMD->setLogicalId($logId);
-        $wCMD->setIsVisible(1);
-        $wCMD->setName(__($setting['name'], __FILE__));
-        log::add(self::$__CUR_CLASS__, 'debug', "╟─ creation de la commande : ".$setting['name']." - $logId  de type : ".$setting['type'].'|'.$setting['subtype']);
-      }
-      $wCMD->setType($setting['type']);
-      $wCMD->setSubType($setting['subtype']);
-      $wCMD->setEqLogic_id($this->getId());
-      $wCMD->save();
-    }
- }
-
 
    // format output from API to be more readable
 
@@ -110,6 +130,24 @@ class weenect_base extends eqLogic {
       $wCMD->event($coord);
       $wCMD->save();
     }
+  }
+
+  public function buildLocation() {
+    $return = array(
+      'id' => $this->getLogicalId(),
+      'image' => array('value'=>null),
+      'name' => array('value'=>$this->getName()),
+      'type'=>  $this->getConfiguration('type')
+    );
+    $cmd = $this->getCmd(null, 'coord');
+    if(is_object($cmd)){
+      $return['coord']=$cmd->execCmd();
+      $return['collectDate'] =$cmd->getCollectDate();
+    }
+    $cmd = $this->getCmd(null, 'radius');
+    if(is_object($cmd))$return['radius']=$cmd->execCmd();
+    
+    return $return;
   }
 
 }

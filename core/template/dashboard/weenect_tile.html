@@ -1,0 +1,79 @@
+<div class="eqLogic-widget eqLogic allowResize weenectWidget" style="height: #height#;width: #width#;border:#border#;border-radius:#border-radius#;background-color: #background-color#;color: #color#;#style#" data-eqLogic_id="#id#" data-eqLogic_uid="#uid#" data-version="#version#">
+    <center class="widget-name" style="padding-right: inherit;">
+    <span class="warning" title="#alert_name#">
+      <i class='#alert_icon#'></i>
+    </span>
+        <span style="position:relative" class="cmd refresh pull-right cursor" data-cmd_id="#refresh_id#">
+      <i class="fas fa-sync"></i>
+    </span>
+        <span class="reportModeVisible">#name_display# <span class="object_name">#object_name#</span></span>
+        <a href="#eqLink#" class="reportModeHidden">#name_display# <span class="object_name">#object_name#</span></a>
+    </center>
+    <div class="row" style="margin-right:0px;margin-left:0px">
+        <div class="col-sm-12">
+            <center>
+                #adresses#
+            </center>
+            <center>
+                #current_zone#
+            </center>
+            <center>
+                #last_seen# 
+            </center>
+            <div class="weenect-battery-icon"><i class="fas fa-battery-half"></i> #tracker_battery# %</div>
+            <div class="weenect-accuracy">Précision #accuracy# m</div>
+        </div>
+        <link rel="stylesheet" href="plugins/weenect/3rdparty/leaflet.css"/>
+        <div class="col-sm-12">
+            <div class="weenect" id="map_#id#"></div>
+        </div>
+    </div>
+    <style>
+        <!-- #map_#id#.weenect {
+            width: 100%;
+            height: #height-map#px;
+        }
+        #map_#id#.weenect .leaflet-marker-icon {
+            border-radius: 50% !important;
+        }
+        #weenect-address-#id# .weenect-precision,
+        #weenect-address-#id# .weenect-horodatage,
+        #weenect-address-#id# .weenect-battery{
+            font-size:10px !important;
+        }
+        #weenect-address-#id# .weenect-address{
+            font-size:12px !important;
+        } -->
+    </style>
+    <script src="plugins/weenect/3rdparty/leaflet.js"></script>
+    <script src="plugins/weenect/core/template/weenect.template.js"></script>
+    <script type="text/javascript">
+    
+        if ('#refresh_id#' != ''){
+            $('.eqLogic[data-eqLogic_uid=#uid#] .refresh').on('click', function () {
+                jeedom.cmd.execute({id: '#refresh_id#'});
+            });
+        }else{
+            $('.eqLogic[data-eqLogic_uid=#uid#] .refresh').remove();
+        }
+        var data#id#=JSON.parse('#json#');
+
+        weenectSetTheme(data#id#['light-theme'], data#id#['dark-theme']);
+        weenectCreateMap(#id#, data#id#['control-attributions'], data#id#['control-zoom']);
+        weenectObjects.maps[#id#].customZoom = parseInt('#zoom#');
+
+        
+        weenectCreateMarker(#id#, data#id#.tracker);
+        //weenectCreatePoint(#id#, data#id#.tracker);
+        // for zones
+        for(id in data#id#.zones){
+            weenectCreateMarker(#id#, data#id#.zones[id]);
+            //weenectCreatePoint(#id#, data#id#.points[id], id);
+        }
+        weenectFocusFeatureGroup(#id#);
+        weenectMapLoaded(#id#);
+    </script>
+
+
+   
+</div>

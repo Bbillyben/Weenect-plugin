@@ -41,7 +41,7 @@ class weenect extends weenect_base {
       // position
       'latitude'=>array('name'=>'Latitude','type'=>'info', 'subtype'=>'numeric'),
       'longitude'=>array('name'=>'Longitude','type'=>'info', 'subtype'=>'numeric'),
-      'radius'=>array('name'=>'Radius','type'=>'info', 'subtype'=>'numeric'),
+      'radius'=>array('name'=>'Precision','type'=>'info', 'subtype'=>'numeric'),
       'coord'=>array('name'=>'Coordonnées','type'=>'info', 'subtype'=>'string'),
       
       // status
@@ -50,7 +50,7 @@ class weenect extends weenect_base {
       'is_in_deep_sleep'=>array('name'=>'Deepsleep','type'=>'info', 'subtype'=>'binary'),
 
       //action 
-      'update'=>array('name'=>'Mettre à jour','type'=>'action', 'subtype'=>'other'),
+      'refresh'=>array('name'=>'Refresh','type'=>'action', 'subtype'=>'other'),
 
       //date 
       // 'creation_date'=>array('name'=>'Date Creation', 'type'=>'info', 'subtype'=>'string'),
@@ -71,6 +71,9 @@ class weenect extends weenect_base {
     'former_name'=>array('name'=>'former name', 'info'=>'ancien nom equipement', 'hidden'=>true),
   );
 
+  public static function get_cmd_array(){
+      return self::W_CMD_common;
+  }
   /*  -----  utilisataire de calcul de distance entre deux points
   * selon la méthode de calcul Haversine http://villemin.gerard.free.fr/aGeograp/Distance.htm
   * retourne une distance en mètre
@@ -328,7 +331,12 @@ class weenect extends weenect_base {
 	}
 
 
-  // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
+
+  /* --------------------------------------------------------------------------------------
+     -----------------------------------  Methodes d'instance -----------------------------
+     -------------------------------------------------------------------------------------- */
+  
+     // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
   public function preSave() {
     //synchro des zones
     $odlName= $this->getConfiguration('former_name');// ancien nom de l'équipement
@@ -382,45 +390,161 @@ class weenect extends weenect_base {
 
       $zones = weenect_zone::byTracker($this->getLogicalId());
       // log::add(__CLASS__, 'debug', 'tracker calc - # pos :'.$tPos." radius : ".$tRad );
+      $found =false;
       foreach ($zones as $zone){
           $zCmd= $zone->getCmd(null, 'coord');
           $zPos = (is_object($zCmd)?$zCmd->execCmd():null);
           if(!$zPos)continue;
 
-          $zRadCmd =  $zone->getCmd(null, 'distance');
+          $zRadCmd =  $zone->getCmd(null, 'radius');
           $in = $zone->getCmd(null, 'is_in');
 
           $zRad = (is_object($zRadCmd)?$zRadCmd->execCmd():0);
           $dist = self::distance($tPos, $zPos);
-          $rad =  $tRad +$zRad;
-          // log::add(__CLASS__, 'debug', 'dist calc - '.$zone->getName()." # pos :".$zPos." radius : ".$zRad );
-          // log::add(__CLASS__, 'debug', 'dist = '.$dist);
-          if($rad>= $dist){
+          $rad =  $tRad + $zRad;
+          log::add(__CLASS__, 'debug', 'dist calc - '.$zone->getName()." # pos :".$zPos." radius : ".$rad );
+          log::add(__CLASS__, 'debug', 'dist = '.$dist);
+          if($rad >= $dist){
             $zIdcmd =$this->getCmd(null, 'curr_zone_id');
             if(is_object($zIdcmd))$zIdcmd->event($zone->getLogicalId());
             $zNamecmd =$this->getCmd(null, 'curr_zone_name');
             if(is_object($zNamecmd))$zNamecmd->event($zone->getName());
             if(is_object($in))$in->event(1);
-            
+            $found = true;
           }else{
             if(is_object($in))$in->event(0);
           }
       }
-      $zIdcmd =$this->getCmd(null, 'curr_zone_id');
-      if(is_object($zIdcmd))$zIdcmd->event(0);
-      $zNamecmd =$this->getCmd(null, 'curr_zone_name');
-      if(is_object($zNamecmd))$zNamecmd->event(null);
+      if(!$found){
+        $zIdcmd =$this->getCmd(null, 'curr_zone_id');
+        if(is_object($zIdcmd))$zIdcmd->event(0);
+        $zNamecmd =$this->getCmd(null, 'curr_zone_name');
+        if(is_object($zNamecmd))$zNamecmd->event(null);
+      }
+
   }
+
+    /* --------------------------------------------------------------------------------------
+     ------------------------------------  widget personnalisé ------------------------------
+     -------------------------------------------------------------------------------------- */
+  
+    public static function getMapLayers(){
+      return array(
+        'CartoDB.DarkMatter'=>array('maxZoom'=>19,'url'=>'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
+        'CartoDB.DarkMatterNoLabels'=>array('maxZoom'=>19,'url'=>'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
+        'CartoDB.Positron'=>array('maxZoom'=>19,'url'=>'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
+        'CartoDB.PositronNoLabels'=>array('maxZoom'=>19,'url'=>'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
+        'CartoDB.Voyager'=>array('maxZoom'=>19,'url'=>'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
+        'CartoDB.VoyagerLabelsUnder'=>array('url'=>'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
+        'CartoDB.VoyagerNoLabels'=>array('maxZoom'=>19,'url'=>'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
+        'Esri.DeLorme'=>array('minZoom'=>1,'maxZoom'=>11,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/Specialty/DeLorme_World_Base_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Copyright: &copy;2012 DeLorme'),
+        'Esri.NatGeoWorldMap'=>array('maxZoom'=>16,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'),
+        'Esri.OceanBasemap'=>array('maxZoom'=>13,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri'),
+        'Esri.WorldGrayCanvas'=>array('maxZoom'=>16,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'),
+        'Esri.WorldImagery'=>array('url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'),
+        'Esri.WorldPhysical'=>array('maxZoom'=>8,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: US National Park Service'),
+        'Esri.WorldShadedRelief'=>array('maxZoom'=>13,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: Esri'),
+        'Esri.WorldStreetMap'=>array('url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'),
+        'Esri.WorldTerrain'=>array('maxZoom'=>13,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: USGS, Esri, TANA, DeLorme, and NPS'),
+        'Esri.WorldTopoMap'=>array('url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'),
+        'OpenStreetMap.BZH'=>array('maxZoom'=>19,'url'=>'https://tile.openstreetmap.bzh/br/{z}/{x}/{y}.png','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, Tiles courtesy of <a href=\"http://www.openstreetmap.bzh/\" target=\"_blank\">Breton OpenStreetMap Team</a>'),
+        'OpenStreetMap.DE'=>array('maxZoom'=>18,'url'=>'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        'OpenStreetMap.France'=>array('maxZoom'=>20,'url'=>'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png','attribution'=>'&copy; Openstreetmap France | &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        'OpenStreetMap.HOT'=>array('maxZoom'=>19,'url'=>'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, Tiles style by <a href=\"https://www.hotosm.org/\" target=\"_blank\">Humanitarian OpenStreetMap Team</a> hosted by <a href=\"https://openstreetmap.fr/\" target=\"_blank\">OpenStreetMap France</a>'),
+        'OpenStreetMap.Mapnik'=>array('maxZoom'=>19,'url'=>'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        'OpenTopoMap'=>array('maxZoom'=>17,'url'=>'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png','attribution'=>'Map data: &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, <a href=\"http://viewfinderpanoramas.org\">SRTM</a> | Map style: &copy; <a href=\"https://opentopomap.org\">OpenTopoMap</a> (<a href=\"https://creativecommons.org/licenses/by-sa/3.0/\">CC-BY-SA</a>)'),
+        'Stamen.Terrain'=>array('minZoom'=>0,'maxZoom'=>18,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        'Stamen.TerrainBackground'=>array('minZoom'=>0,'maxZoom'=>18,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        'Stamen.Toner'=>array('minZoom'=>0,'maxZoom'=>20,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        'Stamen.TonerBackground'=>array('minZoom'=>0,'maxZoom'=>20,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        'Stamen.TonerLite'=>array('minZoom'=>0,'maxZoom'=>20,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        'Stamen.Watercolor'=>array('minZoom'=>1,'maxZoom'=>16,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}','subdomains'=>'abcd','ext'=>'jpg','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        'Wikimedia'=>array('minZoom'=>1,'maxZoom'=>19,'url'=>'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png','attribution'=>'<a href=\"https://wikimediafoundation.org/wiki/Maps_Terms_of_Use\">Wikimedia</a'));
+  }
+
+  public function toHtml($_version = 'dashboard') {
+    $replace = $this->preToHtml($_version, array(), true);
+    if (!is_array($replace)) {
+        return $replace;
+    }
+    log::add(__CLASS__, 'debug', '-----------------------  to html ------------------------------');
+    $version = jeedom::versionAlias($_version);
+    $version = jeedom::versionAlias($_version);
+    $replace['#text_color#'] = $this->getConfiguration('text_color');
+    $replace['#version#'] = $_version;
+    $replace['#logicalId#'] = $this->getLogicalId();
+    $refresh = $this->getCmd(null, 'refresh');
+    if (is_object($refresh)) {
+        $replace['#refresh_id#'] = $refresh->getId();
+    }
+    $data = array();
+    // les fond de carte 
+    $mapsBG = self::getMapLayers();
+    if(array_key_exists(config::byKey('light-theme', 'weenect', 'OpenStreetMap.Mapnik'), $mapsBG)){
+        $data['light-theme'] = $mapsBG[config::byKey('light-theme', 'weenect', 'OpenStreetMap.Mapnik')];
+    }else{
+        $data['light-theme'] =$mapsBG['OpenStreetMap.Mapnik'];
+    }
+    if(array_key_exists(config::byKey('dark-theme', 'weenect', 'OpenStreetMap.Mapnik'), $mapsBG)){
+        $data['dark-theme'] = $mapsBG[config::byKey('dark-theme', 'weenect', 'OpenStreetMap.Mapnik')];
+    }else{
+        $data['dark-theme'] = $mapsBG['OpenStreetMap.Mapnik'];
+    }
+
+    // Data not implementer
+    $data['control-zoom'] = TRUE;
+    $data['control-attributions'] = False;
+    $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 60 : 170;
+
+    // tracker info
+    $cmd =$this->getCmd(null, 'coord');
+    $replace['#adresses#'] = is_object($cmd)?$cmd->execCmd():"no adress";
+    $data['tracker']=$this->buildLocation();
+    $data['tracker']['color']="#76c12d";
+    $cmd  =$this->getCmd(null, 'curr_zone_name');
+    $zName= is_object($cmd) ? $cmd->execCmd():0;
+    $zName = preg_replace('/'.$this->getName().'-/',"",$zName);
+    $replace['#current_zone#'] = $zName ? $zName : "-";
+    $replace['#last_seen#']  = $data['tracker']['collectDate'];
+    $cmd  =$this->getCmd(null, 'battery');
+    $replace['#tracker_battery#']  =  is_object($cmd) ? $cmd->execCmd():"-";
+    $cmd  =$this->getCmd(null, 'radius');
+    $replace['#accuracy#'] = is_object($cmd) ? $cmd->execCmd():"-";
+
+
+    // for zone
+    $data['zones']=array();
+    $zones = weenect_zone::byTracker($this->getLogicalId());
+    foreach($zones as $z){
+      $zId = $z->getLogicalId();
+      $data['zones'][$zId]=$z->buildLocation();
+      $data['zones'][$zId]['color']="#d0aaac";
+      $data['zones'][$zId]['name']=preg_replace('/'.$this->getName().'-/',"",$data['zones'][$zId]['name']);
+
+    }
+
+    $replace['#json#'] = str_replace("'", "\'", json_encode($data));
+    // renvoi du template
+    
+    log::add(__CLASS__, 'debug',json_encode($replace));
+    return $this->postToHtml($_version, template_replace($replace, getTemplate('core', $version, 'weenect_tile', 'weenect')));
+  }
+
+  
+
+
+//  ======================= Class weenect END
 }
 
 class weenectCmd extends cmd {
 
   // Exécution d'une commande
   public function execute($_options = array()) {
-    log::add('weenect','debug', "╔═══════════════════════ execute CMD : ".$this->getId()." | ".$this->getHumanName().", logical id : ".$this->getLogicalId() ."  options : ".print_r($_options));
+    log::add('weenect','debug', "╔═══════════════════════ execute CMD : ".$this->getId()." | ".$this->getHumanName().", logical id : ".$this->getLogicalId() ."  options : ".json_encode($_options));
     log::add('weenect','debug', '╠════ Eq logic '.$this->getEqLogic()->getHumanName());
     switch($this->getLogicalId()){
       case 'update':
+      case 'refresh':
         // demande la mise à jour de toutes les position des trackers.
         weenect::update_position();
         break;
