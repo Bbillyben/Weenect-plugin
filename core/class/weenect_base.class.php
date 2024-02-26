@@ -135,18 +135,31 @@ class weenect_base extends eqLogic {
   public function buildLocation() {
     $return = array(
       'id' => $this->getLogicalId(),
-      'image' => array('value'=>null),
       'name' => array('value'=>$this->getName()),
-      'type'=>  $this->getConfiguration('type')
+      'type'=>  get_class($this)
     );
     $cmd = $this->getCmd(null, 'coord');
-    if(is_object($cmd)){
-      $return['coord']=$cmd->execCmd();
-      $return['collectDate'] =$cmd->getCollectDate();
-    }
+    $return['coord'] = static::buildCmd($cmd);
+
     $cmd = $this->getCmd(null, 'radius');
-    if(is_object($cmd))$return['radius']=$cmd->execCmd();
+    $return['radius'] = static::buildCmd($cmd);
     
+    return $return;
+  }
+  public static function buildCmd($cmd){
+    if(is_object($cmd)){
+      $return = array(
+        'id'=>$cmd->getId(),
+        'value'=> $cmd->execCmd(),
+        'collectDate'=> $cmd->getCollectDate()
+      );
+    }else{
+      $return = array(
+        'id' =>null,
+        'value' => null,
+        'collectDate' => null
+      );
+    }
     return $return;
   }
 

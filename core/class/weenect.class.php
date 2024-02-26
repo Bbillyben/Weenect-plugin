@@ -28,6 +28,8 @@ require_once __DIR__  . '/W_API.class.php';
 
 class weenect extends weenect_base {
   const DEFAULT_CRON = "*/30 * * * *";// CRON par défaut pour les appels aux update de position - configurable dans le plugin
+  const DEFAULT_TRACKER_COLOR = "pink";
+  const DEFAULT_ZONE_COLOR = "green";
   // tableaux des commandes
   const W_CMD_common = array(
       'type'=>array('name'=>'type','type'=>'info', 'subtype'=>'string'), 
@@ -493,33 +495,45 @@ class weenect extends weenect_base {
 
     // Data not implementer
     $data['control-zoom'] = TRUE;
-    $data['control-attributions'] = False;
-    $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 60 : 170;
+    $data['control-attributions'] = TRUE;
+    $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 70 : 170;
 
     // tracker info
     $cmd =$this->getCmd(null, 'coord');
-    $replace['#adresses#'] = is_object($cmd)?$cmd->execCmd():"no adress";
+    if(is_object($cmd))$replace['#coordonate#'] = "<span id='coord' class='cmd weenect-coord ' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span>";
     $data['tracker']=$this->buildLocation();
-    $data['tracker']['color']="#76c12d";
+    $data['tracker']['color']=config::byKey('tracker-color', __CLASS__)?:self::DEFAULT_TRACKER_COLOR;
+
     $cmd  =$this->getCmd(null, 'curr_zone_name');
     $zName= is_object($cmd) ? $cmd->execCmd():0;
     $zName = preg_replace('/'.$this->getName().'-/',"",$zName);
-    $replace['#current_zone#'] = $zName ? $zName : "-";
-    $replace['#last_seen#']  = $data['tracker']['collectDate'];
-    $cmd  =$this->getCmd(null, 'battery');
-    $replace['#tracker_battery#']  =  is_object($cmd) ? $cmd->execCmd():"-";
-    $cmd  =$this->getCmd(null, 'radius');
-    $replace['#accuracy#'] = is_object($cmd) ? $cmd->execCmd():"-";
+    if(! $zName) $zName="-";
+    $replace['#current_zone#'] ="<span id='current_zone' class='cmd weenect-current' data-cmd_id='".( is_object($cmd) ?$cmd->getId():0)."'>". $zName."</span>";
 
+    $cmd=$this->getCmd(null, 'date_tracker');
+    if(is_object($cmd))$replace['#last_seen#']  =  "<span id='date_tracker' class='cmd weenect-horodatage' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span>";
+    $data['tracker']['last_seen']=static::buildCmd($cmd);
+    
+    $cmd  =$this->getCmd(null, 'battery');
+    if(is_object($cmd)) $replace['#tracker_battery#']  =  "<span class='cmd weenect-battery-icon' data-cmd_id='".$cmd->getId()."'><i class='fas fa-battery-half'></i></span><span id='battery' class='cmd weenect-battery' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span><span class='cmd weenect-battery'>%</span>";
+    $data['tracker']['battery']=static::buildCmd($cmd);
+   
+   
+    $cmd  =$this->getCmd(null, 'radius');
+    if(is_object($cmd))$replace['#accuracy#'] = "<span id='radius' class='cmd weenect-precision' data-cmd_id='".$cmd->getId()."'> Precision :".$cmd->execCmd()." m</span>";
+    $data['tracker']['radius']=static::buildCmd($cmd);
 
     // for zone
     $data['zones']=array();
     $zones = weenect_zone::byTracker($this->getLogicalId());
+    $zoneColor = config::byKey('zone-color', __CLASS__)?:self::DEFAULT_ZONE_COLOR;
     foreach($zones as $z){
       $zId = $z->getLogicalId();
       $data['zones'][$zId]=$z->buildLocation();
-      $data['zones'][$zId]['color']="#d0aaac";
+      $data['zones'][$zId]['color']=$zoneColor;
       $data['zones'][$zId]['name']=preg_replace('/'.$this->getName().'-/',"",$data['zones'][$zId]['name']);
+      $cmd = $z->getCmd(null, "is_in");
+      $data['zones'][$zId]['is_in']=static::buildCmd($cmd);
 
     }
 

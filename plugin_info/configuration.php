@@ -138,6 +138,18 @@ $themes = weenect::getMapLayers();
                 </select>
             </div>
         </div>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Couleur du Tracker}}</label>
+            <div class="col-lg-1">
+                <input type="color" class="configKey form-control" data-l1key="tracker-color">
+            </div>
+        </div>  
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Couleur des zones}}</label>
+            <div class="col-lg-1">
+                <input type="color" class="configKey form-control" data-l1key="zone-color">
+            </div>
+        </div> 
   </fieldset>
 
 
