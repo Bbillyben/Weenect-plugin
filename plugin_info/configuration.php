@@ -162,7 +162,6 @@ $themes = weenect::getMapLayers();
           </label>
           <div class="col-md-3">
             <select id="freq_selector" class="configKey form-control" data-l1key="history_duration">
-              <option value="0.5">30 {{minutes}}</option>
               <option value="1">1 {{heure}}</option>
               <option value="3">3 {{heure}}</option>
               <option value="12">12 {{heure}}</option>
