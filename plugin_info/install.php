@@ -18,13 +18,23 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 // Fonction exécutée automatiquement après l'installation du plugin
-function template_install() {
-}
+// function weenect_install() {
+//     log::add('weenect', 'info', "weenect_install CALL");
+// }
 
 // Fonction exécutée automatiquement après la mise à jour du plugin
-function template_update() {
-}
+// function template_update() {
+// }
 
 // Fonction exécutée automatiquement après la suppression du plugin
-function template_remove() {
+function weenect_remove() {
+    log::add('weenect', 'info', ">>>>>>>   Deactivate WEENECT Plugin   <<<<<");
+    log::add('weenect', 'debug', " ║ removing cron ");
+    $cron = cron::byClassAndFunction('weenect', 'update_position');
+    if(is_object($cron)){
+        log::add('weenect', 'debug', "║ ╟───  remove current cron");
+        $cron->remove();
+      }
+
 }
+
