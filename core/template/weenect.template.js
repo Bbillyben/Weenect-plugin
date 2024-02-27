@@ -152,8 +152,10 @@ function weenectUpdateLastSeen(id, _options){
     cmd.html(formatDate(_options.display_value));
 }
 function weenectUpdateCurrentZone(id, _options){
-    var cmd = $('.cmd.weenect-current[data-cmd_id='+id+']');   
-    cmd.html(_options.display_value.replace(trackerName+'-',""));
+    var cmd = $('.cmd.weenect-current[data-cmd_id='+id+']'); 
+    var zN = _options.display_value.replace(trackerName+'-',"");
+    if(zN == 0 )zN='-';
+    cmd.html(zN);
 }
 
 function weenectUpdateAccuracy(id, _options){
