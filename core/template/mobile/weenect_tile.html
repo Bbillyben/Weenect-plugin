@@ -1,13 +1,14 @@
-<div class="eqLogic-widget eqLogic allowResize weenectWidget" style="height: #height#;width: #width#;border:#border#;border-radius:#border-radius#;background-color: #background-color#;color: #color#;#style#" data-eqLogic_id="#id#" data-eqLogic_uid="#uid#" data-version="#version#">
-    <center class="widget-name" style="padding-right: inherit;">
-    <span class="warning" title="#alert_name#">
-      <i class='#alert_icon#'></i>
-    </span>
-        <span style="position:relative" class="cmd refresh pull-right cursor" data-cmd_id="#refresh_id#">
-      <i class="fas fa-sync"></i>
-    </span>
-        <span class="reportModeVisible">#name_display# <span class="object_name">#object_name#</span></span>
-        <a href="#eqLink#" class="reportModeHidden">#name_display# <span class="object_name">#object_name#</span></a>
+<div class="eqLogic eqLogic-widget #class#" data-eqLogic_id="#id#" data-eqType="#eqType#" data-version="#version#" data-eqLogic_uid="#uid#" data-translate-category="#translate_category#" data-category="#category#" data-tags="#tags#" style="#style#">
+	<span class="cmd refresh pull-right cursor" data-cmd_id="#refresh_id#">
+		<i class="fas fa-sync"></i>
+	</span>
+    <center>
+		<span class="widget-name">
+			<span class="warning" title="#alert_name#">
+				<i class='#alert_icon#'></i>
+			</span>
+			<span>#name_display# <span class="object_name">#object_name#</span></span><br/>
+		</span>
     </center>
     <div class="row weenect-#id#" style="margin-right:0px;margin-left:0px;display:flex;">
             <div class="col-sm-4"><span class="cmd" data-cmd_id="#id#">#last_seen#</span></div>
@@ -50,6 +51,7 @@
             font-size:12px !important;
         }
     </style>
+    
     <script src="plugins/weenect/3rdparty/leaflet.js"></script>
     <script src="plugins/weenect/core/template/weenect.template.js"></script>
     <script type="text/javascript">
@@ -63,7 +65,6 @@
         }
         var data#id#=JSON.parse('#json#');
         var trackerName='#name_display#';
-        //console.log(JSON.stringify(data#id#));
 
         weenectSetTheme(data#id#['light-theme'], data#id#['dark-theme']);
         weenectCreateMap(#id#, data#id#['control-attributions'], data#id#['control-zoom']);

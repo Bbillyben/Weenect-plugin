@@ -129,6 +129,15 @@ $confList = weenect::W_CONF_common;
 									<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked>{{Visible}}</label>
 								</div>
 							</div>
+							<legend><i class="fas fa-map-marked-alt"></i> {{Widget}}</legend>
+							<div class="form-group">
+								<label class="col-sm-4 control-label">{{Afficher l'historique}}
+								<sup><i class="fas fa-question-circle tooltips" title="Affiche l'historique du tracker selon le temps défini dans la configuration du plugin"></i></sup>
+								</label>
+								<div class="col-sm-6">
+									<input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="show_history" checked>
+								</div>
+							</div>
 
 							<legend><i class="fas fa-info"></i> {{Information Tracker}}</legend>
 							<?php

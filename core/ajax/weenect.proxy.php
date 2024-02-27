@@ -1,4 +1,5 @@
 <?php
+# Directly from https://github.com/yoan-m/jeedom_gsl by yoan-m (https://github.com/yoan-m)
  # Check for url parameter, and prevent file transfer
 if (isset($_GET['url']) and preg_match('#^https?://#', $_GET['url']) === 1) {
 	$url = $_GET['url'];

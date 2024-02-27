@@ -115,8 +115,25 @@ $themes = weenect::getMapLayers();
   <fieldset>
         <legend><i class="fa fa-map"></i> {{Paramètre du Widget}}</legend>
         <div class="form-group">
-            <label class="col-lg-4 control-label">{{Fond cartographique thème light}}</label>
+            <label class="col-lg-4 control-label">{{Couleurs}}</label>
+            <div class="col-lg-1">
+                <input type="color" class="configKey form-control" data-l1key="tracker-color" value="#ee7d2b">{{Tracker}}
+            </div>
+            <div class="col-lg-1">
+                <input type="color" class="configKey form-control" data-l1key="zone-color" value="e2236b">{{Zone}}
+            </div>
+        </div>  
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Afficher l'épingle de zone}}</label>
             <div class="col-lg-4">
+                <label class="checkbox-inline"><input type="checkbox" class="configKey form-control" data-l1key="show-pin_dash" checked>{{Dashboard}}</label>
+                <label class="checkbox-inline"><input type="checkbox" class="configKey form-control" data-l1key="show-pin_mob">{{Mobile}}</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Fond cartographique thème light}}</label>
+            <div class="col-md-3">
                 <select class="configKey form-control" data-l1key="light-theme">
                     <?php
                     foreach ($themes as $key => $value) {
@@ -128,7 +145,7 @@ $themes = weenect::getMapLayers();
         </div>
         <div class="form-group">
             <label class="col-lg-4 control-label">{{Fond cartographique thème dark}}</label>
-            <div class="col-lg-4">
+            <div class="col-md-3">
                 <select class="configKey form-control" data-l1key="dark-theme">
                     <?php
                     foreach ($themes as $key => $value) {
@@ -138,18 +155,24 @@ $themes = weenect::getMapLayers();
                 </select>
             </div>
         </div>
+        
         <div class="form-group">
-            <label class="col-lg-4 control-label">{{Couleur du Tracker}}</label>
-            <div class="col-lg-1">
-                <input type="color" class="configKey form-control" data-l1key="tracker-color">
-            </div>
-        </div>  
-        <div class="form-group">
-            <label class="col-lg-4 control-label">{{Couleur des zones}}</label>
-            <div class="col-lg-1">
-                <input type="color" class="configKey form-control" data-l1key="zone-color">
-            </div>
-        </div> 
+          <label class="col-md-4 control-label">{{Durée de l'historique}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{durée de l'historiqe du widget}}"></i></sup>
+          </label>
+          <div class="col-md-3">
+            <select id="freq_selector" class="configKey form-control" data-l1key="history_duration">
+              <option value="0.5">30 {{minutes}}</option>
+              <option value="1">1 {{heure}}</option>
+              <option value="3">3 {{heure}}</option>
+              <option value="12">12 {{heure}}</option>
+              <option value="24">1 {{jour}}</option>
+              <option value="72">3 {{jour}}</option>
+              <option value="84">1 {{semaine}}</option>
+            </select>
+            <span class="warning_manualupdate" style="color: orange;">le rafraichissements des données ne sera effectué qu'avec l'appel à la commande 'rafraichir'</span>
+          </div>
+        </div>
   </fieldset>
 
 

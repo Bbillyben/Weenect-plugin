@@ -439,13 +439,13 @@ class weenect extends weenect_base {
         'CartoDB.Voyager'=>array('maxZoom'=>19,'url'=>'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
         'CartoDB.VoyagerLabelsUnder'=>array('url'=>'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
         'CartoDB.VoyagerNoLabels'=>array('maxZoom'=>19,'url'=>'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png','subdomains'=>'abcd','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'),
-        'Esri.DeLorme'=>array('minZoom'=>1,'maxZoom'=>11,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/Specialty/DeLorme_World_Base_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Copyright: &copy;2012 DeLorme'),
+        //'Esri.DeLorme'=>array('minZoom'=>1,'maxZoom'=>11,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/Specialty/DeLorme_World_Base_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Copyright: &copy;2012 DeLorme'),
         'Esri.NatGeoWorldMap'=>array('maxZoom'=>16,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'),
-        'Esri.OceanBasemap'=>array('maxZoom'=>13,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri'),
+        //'Esri.OceanBasemap'=>array('maxZoom'=>13,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri'),
         'Esri.WorldGrayCanvas'=>array('maxZoom'=>16,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'),
         'Esri.WorldImagery'=>array('url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'),
-        'Esri.WorldPhysical'=>array('maxZoom'=>8,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: US National Park Service'),
-        'Esri.WorldShadedRelief'=>array('maxZoom'=>13,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: Esri'),
+        //'Esri.WorldPhysical'=>array('maxZoom'=>8,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: US National Park Service'),
+        // 'Esri.WorldShadedRelief'=>array('maxZoom'=>13,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: Esri'),
         'Esri.WorldStreetMap'=>array('url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'),
         'Esri.WorldTerrain'=>array('maxZoom'=>13,'url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Source: USGS, Esri, TANA, DeLorme, and NPS'),
         'Esri.WorldTopoMap'=>array('url'=>'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}','attribution'=>'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'),
@@ -455,13 +455,14 @@ class weenect extends weenect_base {
         'OpenStreetMap.HOT'=>array('maxZoom'=>19,'url'=>'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, Tiles style by <a href=\"https://www.hotosm.org/\" target=\"_blank\">Humanitarian OpenStreetMap Team</a> hosted by <a href=\"https://openstreetmap.fr/\" target=\"_blank\">OpenStreetMap France</a>'),
         'OpenStreetMap.Mapnik'=>array('maxZoom'=>19,'url'=>'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png','attribution'=>'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
         'OpenTopoMap'=>array('maxZoom'=>17,'url'=>'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png','attribution'=>'Map data: &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, <a href=\"http://viewfinderpanoramas.org\">SRTM</a> | Map style: &copy; <a href=\"https://opentopomap.org\">OpenTopoMap</a> (<a href=\"https://creativecommons.org/licenses/by-sa/3.0/\">CC-BY-SA</a>)'),
-        'Stamen.Terrain'=>array('minZoom'=>0,'maxZoom'=>18,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
-        'Stamen.TerrainBackground'=>array('minZoom'=>0,'maxZoom'=>18,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
-        'Stamen.Toner'=>array('minZoom'=>0,'maxZoom'=>20,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
-        'Stamen.TonerBackground'=>array('minZoom'=>0,'maxZoom'=>20,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
-        'Stamen.TonerLite'=>array('minZoom'=>0,'maxZoom'=>20,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
-        'Stamen.Watercolor'=>array('minZoom'=>1,'maxZoom'=>16,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}','subdomains'=>'abcd','ext'=>'jpg','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
-        'Wikimedia'=>array('minZoom'=>1,'maxZoom'=>19,'url'=>'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png','attribution'=>'<a href=\"https://wikimediafoundation.org/wiki/Maps_Terms_of_Use\">Wikimedia</a'));
+        //'Stamen.Terrain'=>array('minZoom'=>0,'maxZoom'=>18,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        //'Stamen.TerrainBackground'=>array('minZoom'=>0,'maxZoom'=>18,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        // 'Stamen.Toner'=>array('minZoom'=>0,'maxZoom'=>20,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        // 'Stamen.TonerBackground'=>array('minZoom'=>0,'maxZoom'=>20,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        // 'Stamen.TonerLite'=>array('minZoom'=>0,'maxZoom'=>20,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}','subdomains'=>'abcd','ext'=>'png','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        // 'Stamen.Watercolor'=>array('minZoom'=>1,'maxZoom'=>16,'url'=>'https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}','subdomains'=>'abcd','ext'=>'jpg','attribution'=>'Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'),
+        // 'Wikimedia'=>array('minZoom'=>1,'maxZoom'=>19,'url'=>'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png','attribution'=>'<a href=\"https://wikimediafoundation.org/wiki/Maps_Terms_of_Use\">Wikimedia</a')
+      );
   }
 
   public function toHtml($_version = 'dashboard') {
@@ -471,8 +472,6 @@ class weenect extends weenect_base {
     }
     log::add(__CLASS__, 'debug', '-----------------------  to html ------------------------------');
     $version = jeedom::versionAlias($_version);
-    $version = jeedom::versionAlias($_version);
-    $replace['#text_color#'] = $this->getConfiguration('text_color');
     $replace['#version#'] = $_version;
     $replace['#logicalId#'] = $this->getLogicalId();
     $refresh = $this->getCmd(null, 'refresh');
@@ -494,9 +493,9 @@ class weenect extends weenect_base {
     }
 
     // Data not implementer
-    $data['control-zoom'] = TRUE;
-    $data['control-attributions'] = TRUE;
-    $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 70 : 170;
+    $data['control-zoom'] = ($version == 'dashboard');
+    $data['control-attributions'] = ($version == 'dashboard');
+    $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 70 : 250;
 
     // tracker info
     $cmd =$this->getCmd(null, 'coord');
@@ -507,9 +506,10 @@ class weenect extends weenect_base {
     $cmd  =$this->getCmd(null, 'curr_zone_name');
     $zName= is_object($cmd) ? $cmd->execCmd():0;
     $zName = preg_replace('/'.$this->getName().'-/',"",$zName);
-    if(! $zName) $zName="-";
+    if(! $zName || $zName==0) $zName="-";
     $replace['#current_zone#'] ="<span id='current_zone' class='cmd weenect-current' data-cmd_id='".( is_object($cmd) ?$cmd->getId():0)."'>". $zName."</span>";
-
+    $data['tracker']['current_zone']=static::buildCmd($cmd);
+    
     $cmd=$this->getCmd(null, 'date_tracker');
     if(is_object($cmd))$replace['#last_seen#']  =  "<span id='date_tracker' class='cmd weenect-horodatage' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span>";
     $data['tracker']['last_seen']=static::buildCmd($cmd);
@@ -522,15 +522,21 @@ class weenect extends weenect_base {
     $cmd  =$this->getCmd(null, 'radius');
     if(is_object($cmd))$replace['#accuracy#'] = "<span id='radius' class='cmd weenect-precision' data-cmd_id='".$cmd->getId()."'> Precision :".$cmd->execCmd()." m</span>";
     $data['tracker']['radius']=static::buildCmd($cmd);
-
+    // history du tracker
+    if($this->getConfiguration("show_history")){
+      $data['tracker']['history']=config::byKey('history_duration', __CLASS__);
+    }
+    
     // for zone
     $data['zones']=array();
     $zones = weenect_zone::byTracker($this->getLogicalId());
     $zoneColor = config::byKey('zone-color', __CLASS__)?:self::DEFAULT_ZONE_COLOR;
+    $showPin = ($version == 'dashboard') ? config::byKey('show-pin_dash', __CLASS__):config::byKey('show-pin_mob', __CLASS__);
     foreach($zones as $z){
       $zId = $z->getLogicalId();
       $data['zones'][$zId]=$z->buildLocation();
       $data['zones'][$zId]['color']=$zoneColor;
+      $data['zones'][$zId]['pin']=$showPin;
       $data['zones'][$zId]['name']=preg_replace('/'.$this->getName().'-/',"",$data['zones'][$zId]['name']);
       $cmd = $z->getCmd(null, "is_in");
       $data['zones'][$zId]['is_in']=static::buildCmd($cmd);
@@ -539,8 +545,7 @@ class weenect extends weenect_base {
 
     $replace['#json#'] = str_replace("'", "\'", json_encode($data));
     // renvoi du template
-    
-    log::add(__CLASS__, 'debug',json_encode($replace));
+  
     return $this->postToHtml($_version, template_replace($replace, getTemplate('core', $version, 'weenect_tile', 'weenect')));
   }
 
