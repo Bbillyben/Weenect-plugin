@@ -2,7 +2,9 @@ var weenectObjects;
 if(!weenectObjects){
     weenectObjects = {
         maps: {},
-        intervals: {}
+        intervals: {},
+        colors:{}, 
+        history:{}
     };
 }
 
@@ -173,6 +175,33 @@ function weenectUpdateAddress(id, _options, eqId){
     cmd.empty().append(_options.display_value);
     cmd.attr('title','Date : '+_options.collectDate);
 }
+
+function weenectDrawHistory(eqId,id, points){
+    var map = weenectObjects.maps[id];
+    if(!map)return;
+    if(weenectObjects.history[eqId]){
+        for(var k in  weenectObjects.history[eqId]){
+            circle=weenectObjects.history[eqId][k]
+            map.featureGroup.removeLayer(circle);
+        }
+    }
+    weenectObjects.history[eqId]=[];
+    var color = weenectObjects.colors[eqId]??'red';
+    var last=[0,0];
+    for(var k in points ){
+        coord=points[k];
+        if(coord.toString()==last)continue;
+        last = coord.toString();
+        var circle = L.circle(coord, {
+                radius: 2,
+                fillColor: color,
+                fillOpacity: 0.5,
+                    weight: 0
+            }).addTo(map.featureGroup);
+            weenectObjects.history[eqId].push(circle);
+    }
+}
+
 function weenectUpdateMarker(eqId, coords, cmdId){
     for (const key in weenectObjects.maps){
         var map = weenectObjects.maps[key];
@@ -196,6 +225,7 @@ function weenectUpdateMarker(eqId, coords, cmdId){
                     var values = result.data.map(function(elt) {
                       return elt[1].split(',').map(function(coord) { return parseFloat(coord)}) });
                     weenectObjects.maps[this.context.map].histories[result.eqLogic.logicalId].feature.setLatLngs(values);
+                    weenectDrawHistory(eqId, key, values);
                   }
               });
             }
@@ -256,6 +286,7 @@ function weenectCreateMap(eqId, attribution, zoom){
 
 function weenectCreateMarker(eqId, point){
     var id =point.id;
+    weenectObjects.colors[id] = point.color;
     if(point.type  && point.type == "weenect"){
         weenectCreateTracker(eqId, point, id);
     }else if(point.pin && point.pin == 1){
@@ -306,8 +337,12 @@ function weenectCreateHistory(eqId, point, id){
         var history = L.polyline([], {
             color: point.color,
             fillColor: point.color,
-            fillOpacity: 0.1,
-            weight: 1.5
+            opacity: 0.5,
+            weight: 3,
+            linejoin:"round",
+            lineCap: 'round',
+            dashArray: '3, 10', 
+            dashOffset: '0'
         }).addTo(weenectObjects.maps[eqId].featureGroup);
         weenectObjects.maps[eqId].histories[id] = {hours: point.history, feature: history};
 }
