@@ -77,7 +77,7 @@ $confList = weenect::W_CONF_common;
 			<li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
 			<li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
 			<li role="presentation"><a href="#commandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i> {{Commandes}}</a></li>
-			<li role="presentation"><a href="#zonetab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-map"></i> {{Zones}}</a></li>
+			<li role="presentation"><a href="#zonetab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-map-marked-alt"></i> {{Zones}}</a></li>
 		</ul>
 		<div class="tab-content">
 			<!-- Onglet de configuration de l'équipement -->
@@ -127,6 +127,15 @@ $confList = weenect::W_CONF_common;
 								<div class="col-sm-6">
 									<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked>{{Activer}}</label>
 									<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked>{{Visible}}</label>
+								</div>
+							</div>
+							<legend><i class="fas fa-map-marked-alt"></i> {{Widget}}</legend>
+							<div class="form-group">
+								<label class="col-sm-4 control-label">{{Afficher l'historique}}
+								<sup><i class="fas fa-question-circle tooltips" title="Affiche l'historique du tracker selon le temps défini dans la configuration du plugin"></i></sup>
+								</label>
+								<div class="col-sm-6">
+									<input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="show_history" checked>
 								</div>
 							</div>
 
@@ -196,12 +205,12 @@ $confList = weenect::W_CONF_common;
 			<!-- Onglet des zones de l'équipement -->
 			<div role="tabpanel" class="tab-pane" id="zonetab">
 				
-				<br><br>
-				<div class=""> {{liste des zones affiliées à l'équipement}}</div>
-				<div id="zone_list"></div>
-
-				<div  class="table-responsive">
-					<div id="zone_container" class="eqLogicThumbnailContainer" style="display:flex;">
+				<div  class="col-lg-12	">
+					<legend><i class="fas fa-map"></i> {{liste des zones affiliées à l'équipement}}</legend>
+					<div  class="col-lg-12">
+						<div id="zone_container" class="eqLogicThumbnailContainer" style="display:flex;">
+						<!-- Ajax loaded Zones -->
+						</div>
 					</div>
 				</div>
 			</div><!-- /.tabpanel #zonetab-->

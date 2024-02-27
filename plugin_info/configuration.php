@@ -16,11 +16,15 @@
 */
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
+require_once dirname(__FILE__) . '/../core/class/weenect_zone.class.php';
+
 include_file('core', 'authentification', 'php');
 if (!isConnect()) {
   include_file('desktop', '404', 'php');
   die();
 }
+$themes = weenect::getMapLayers();
+
 ?>
 <form class="form-horizontal">
   <fieldset>
@@ -29,7 +33,7 @@ if (!isConnect()) {
       <label class="col-md-4 control-label">{{Nom d'utilisateur}}
         <sup><i class="fas fa-question-circle tooltips" title="{{Renseignez le nom d'utilisateur du compte weenect}}"></i></sup>
       </label>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <input class="configKey form-control" data-l1key="username"/>
       </div>
     </div>
@@ -37,7 +41,7 @@ if (!isConnect()) {
       <label class="col-md-4 control-label">{{Mot de Passe}}
         <sup><i class="fas fa-question-circle tooltips" title="{{Renseignez le mot de passe du compte weenect}}"></i></sup>
       </label>
-      <div class="col-md-4" style="display:flex;">
+      <div class="col-md-3" style="display:flex;">
         <input type="password" class="configKey form-control" data-l1key="password"/>
         <a class="btn btn-danger  " id="bt_show_pass"><i class="fas fa-eye"></i></a>
       </div>
@@ -46,7 +50,7 @@ if (!isConnect()) {
       <label class="col-md-4 control-label">{{Fréquence de mise à jour}}
         <sup><i class="fas fa-question-circle tooltips" title="{{fréquence d'interrogation de weenect}}"></i></sup>
       </label>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <select id="freq_selector" class="configKey form-control" data-l1key="freq">
           <option value="manual">{{Manuel}}</option>
           <option value="* * * * *">1 {{minute}}</option>
@@ -80,7 +84,7 @@ if (!isConnect()) {
       <label class="col-md-4 control-label">{{token}}
         <sup><i class="fas fa-question-circle tooltips" title="{{token récupéré pour l'accès à l'API}}"></i></sup>
       </label>
-      <div class="col-md-4" style="display:flex;">
+      <div class="col-md-3" style="display:flex;">
         <span id="token_status" class="configKey form-control"></span>
         <input type="hidden" class="configKey form-control" data-l1key="token" />
         <a class="btn btn-success  " id="bt_get_token">{{Get Token}}</a>
@@ -90,7 +94,7 @@ if (!isConnect()) {
   </fieldset>
 
   <fieldset>
-    <legend><i class="fa fa-list-alt"></i> {{Paramètres Zones}}</legend>
+    <legend><i class="fa fa-map-marked-alt"></i> {{Paramètres Zones}}</legend>
     <div class="form-group">
         <label class="col-lg-4 control-label">{{Ajouter le nom du tracker à celui des zones}}</label>
         <div class="col-lg-4">
@@ -104,6 +108,70 @@ if (!isConnect()) {
             <div class="col-lg-4">
                 <input type="checkbox" class="configKey form-control" data-l1key="link-tracker-conf" checked/>
             </div>
+        </div>
+  </fieldset>
+
+
+  <fieldset>
+        <legend><i class="fa fa-map"></i> {{Paramètre du Widget}}</legend>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Couleurs}}</label>
+            <div class="col-lg-1">
+                <input type="color" class="configKey form-control" data-l1key="tracker-color" value="#ee7d2b">{{Tracker}}
+            </div>
+            <div class="col-lg-1">
+                <input type="color" class="configKey form-control" data-l1key="zone-color" value="e2236b">{{Zone}}
+            </div>
+        </div>  
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Afficher l'épingle de zone}}</label>
+            <div class="col-lg-4">
+                <label class="checkbox-inline"><input type="checkbox" class="configKey form-control" data-l1key="show-pin_dash" checked>{{Dashboard}}</label>
+                <label class="checkbox-inline"><input type="checkbox" class="configKey form-control" data-l1key="show-pin_mob">{{Mobile}}</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Fond cartographique thème light}}</label>
+            <div class="col-md-3">
+                <select class="configKey form-control" data-l1key="light-theme">
+                    <?php
+                    foreach ($themes as $key => $value) {
+                        echo '<option value="' . $key . '">' . $key . '</option>';
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Fond cartographique thème dark}}</label>
+            <div class="col-md-3">
+                <select class="configKey form-control" data-l1key="dark-theme">
+                    <?php
+                    foreach ($themes as $key => $value) {
+                        echo '<option value="' . $key . '">' . $key . '</option>';
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="col-md-4 control-label">{{Durée de l'historique}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{durée de l'historiqe du widget}}"></i></sup>
+          </label>
+          <div class="col-md-3">
+            <select id="freq_selector" class="configKey form-control" data-l1key="history_duration">
+              <option value="0.5">30 {{minutes}}</option>
+              <option value="1">1 {{heure}}</option>
+              <option value="3">3 {{heure}}</option>
+              <option value="12">12 {{heure}}</option>
+              <option value="24">1 {{jour}}</option>
+              <option value="72">3 {{jour}}</option>
+              <option value="84">1 {{semaine}}</option>
+            </select>
+            <span class="warning_manualupdate" style="color: orange;">le rafraichissements des données ne sera effectué qu'avec l'appel à la commande 'rafraichir'</span>
+          </div>
         </div>
   </fieldset>
 
