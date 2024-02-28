@@ -182,7 +182,7 @@ function weenectDrawHistory(eqId,id, points){
     if(weenectObjects.history[eqId]){
         for(var k in  weenectObjects.history[eqId]){
             circle=weenectObjects.history[eqId][k]
-            map.featureGroup.removeLayer(circle);
+            map.historyGroup.removeLayer(circle);
         }
     }
     weenectObjects.history[eqId]=[];
@@ -192,12 +192,12 @@ function weenectDrawHistory(eqId,id, points){
         coord=points[k];
         if(coord.toString()==last)continue;
         last = coord.toString();
-        var circle = L.circle(coord, {
-                radius: 2,
-                fillColor: color,
-                fillOpacity: 0.5,
-                    weight: 0
-            }).addTo(map.featureGroup);
+        var circle = L.circleMarker(coord, {
+            radius : 5,
+            fillColor  : color,
+            fillOpacity: 0.65,
+            weight: 0
+          }).addTo(map.historyGroup);
             weenectObjects.history[eqId].push(circle);
     }
 }
@@ -274,10 +274,11 @@ function weenectCreateMap(eqId, attribution, zoom){
     var map = {markers:{}, circles:{}, histories:{}};
     map.layer = new L.TileLayer('/plugins/weenect/core/ajax/weenect.proxy.php?url='+weenectObjects.theme.url, weenectObjects.theme);
     map.featureGroup = L.featureGroup();
+    map.historyGroup = L.featureGroup();
     map.map = L.map('map_' + eqId, {
         center: [51.5, -0.09],
         zoom: 15, 
-        layers:[map.layer, map.featureGroup],
+        layers:[map.layer, map.historyGroup, map.featureGroup],
         attributionControl: attribution,
         zoomControl: zoom
     });
@@ -343,7 +344,7 @@ function weenectCreateHistory(eqId, point, id){
             lineCap: 'round',
             dashArray: '3, 10', 
             dashOffset: '0'
-        }).addTo(weenectObjects.maps[eqId].featureGroup);
+        }).addTo(weenectObjects.maps[eqId].historyGroup);
         weenectObjects.maps[eqId].histories[id] = {hours: point.history, feature: history};
 }
 
