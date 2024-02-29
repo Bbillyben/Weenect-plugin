@@ -4,7 +4,8 @@ if(!weenectObjects){
         maps: {},
         intervals: {},
         colors:{}, 
-        history:{}
+        history:{}, 
+        heat:{}
     };
 }
 
@@ -176,33 +177,45 @@ function weenectUpdateAddress(id, _options, eqId){
     cmd.attr('title','Date : '+_options.collectDate);
 }
 
-function weenectDrawHistory(eqId,id, points){
-    var map = weenectObjects.maps[id];
+function weenectDrawHistory(eqId, points){
+    //console.log(" weenectDrawHistory :"+eqId);
+    var map = weenectObjects.maps[eqId];
     if(!map)return;
-    if(weenectObjects.history[eqId]){
-        for(var k in  weenectObjects.history[eqId]){
-            circle=weenectObjects.history[eqId][k]
-            map.historyGroup.removeLayer(circle);
-        }
-    }
-    weenectObjects.history[eqId]=[];
+    map.historyGroup.clearLayers();
+    weenectObjects.history[eqId]=points;
     var color = weenectObjects.colors[eqId]??'red';
-    var last=[0,0];
-    for(var k in points ){
-        coord=points[k];
-        if(coord.toString()==last)continue;
-        last = coord.toString();
-        var circle = L.circleMarker(coord, {
-            radius : 5,
-            fillColor  : color,
-            fillOpacity: 0.65,
-            weight: 0
-          }).addTo(map.historyGroup);
-            weenectObjects.history[eqId].push(circle);
+    if(weenectObjects.heat[eqId]==1){
+        heat_point = points.map(subArray => [...subArray, 1]);
+        var heat = L.heatLayer(heat_point, 
+            {
+                radius: 25, 
+                max :3
+            }
+            ).addTo(map.historyGroup);
+    }else{
+        var last=[0,0];
+        for(var k in points ){
+            coord=points[k];
+            if(coord.toString()==last)continue;
+            last = coord.toString();
+            var circle = L.circleMarker(coord, {
+                radius : 5,
+                fillColor  : color,
+                fillOpacity: 0.65,
+                weight: 0
+            }).addTo(map.historyGroup);
+        }
+
     }
 }
+function weenectUpdateHistoryDraw(eqId, heat=false){
+    weenectObjects.heat[eqId]=heat;
+    ////console.log(" -- weenectUpdateHistoryDraw :"+eqId+" / "+weenectObjects.heat[eqId]);
+    weenectDrawHistory(eqId, weenectObjects.history[eqId]);
 
+}
 function weenectUpdateMarker(eqId, coords, cmdId){
+    //console.log("weenectUpdateMarker :"+eqId+" / "+cmdId)
     for (const key in weenectObjects.maps){
         var map = weenectObjects.maps[key];
         if(map.markers[eqId]){
@@ -225,7 +238,7 @@ function weenectUpdateMarker(eqId, coords, cmdId){
                     var values = result.data.map(function(elt) {
                       return elt[1].split(',').map(function(coord) { return parseFloat(coord)}) });
                     weenectObjects.maps[this.context.map].histories[result.eqLogic.logicalId].feature.setLatLngs(values);
-                    weenectDrawHistory(eqId, key, values);
+                    weenectDrawHistory(eqId, values);
                   }
               });
             }
@@ -271,6 +284,7 @@ function weenectSetTheme(light, dark){
 }
 
 function weenectCreateMap(eqId, attribution, zoom){
+    //console.log("weenectCreateMap :"+eqId)
     var map = {markers:{}, circles:{}, histories:{}};
     map.layer = new L.TileLayer('/plugins/weenect/core/ajax/weenect.proxy.php?url='+weenectObjects.theme.url, weenectObjects.theme);
     map.featureGroup = L.featureGroup();
@@ -287,6 +301,7 @@ function weenectCreateMap(eqId, attribution, zoom){
 
 function weenectCreateMarker(eqId, point){
     var id =point.id;
+    //console.log("weenectCreateMarker :"+eqId+" / "+id)
     weenectObjects.colors[id] = point.color;
     if(point.type  && point.type == "weenect"){
         weenectCreateTracker(eqId, point, id);
@@ -303,6 +318,7 @@ function weenectCreateMarker(eqId, point){
     }
 }
 function weenectCreateTracker(eqId, point, id){
+    //console.log("weenectCreateTracker :"+eqId+" / "+id)
     var avatar = weenectLetterAvatar(point.name.value, 60, point.color);
     if(!point.coord.value){
     	return;
@@ -319,6 +335,7 @@ function weenectCreateTracker(eqId, point, id){
     weenectObjects.maps[eqId].markers[id] = marker;
 }
 function weenectCreateZone(eqId, point, id){
+    //console.log("weenectCreateZone :"+eqId+" / "+id)
     var avatar =  weenectZoneAvatar(point.name.value, 36, point.color);//'plugins/weenect/3rdparty/images/blank.png';//'plugins/weenect/3rdparty/images/blank.png';//weenectZoneAvatar(point.name.value, 36, point.color);//plugins/weenect/3rdparty/images/pin.png';
    if(!point.coord.value){
     	return;
@@ -335,6 +352,7 @@ function weenectCreateZone(eqId, point, id){
     weenectObjects.maps[eqId].markers[id] = marker;
 }
 function weenectCreateHistory(eqId, point, id){
+    //console.log("weenectCreateHistory :"+eqId+" / "+id)
         var history = L.polyline([], {
             color: point.color,
             fillColor: point.color,
@@ -363,6 +381,7 @@ function weenectCreateCircle(eqId, point, id, fillAlpha=0.2){
 
 function weenectCreatePoint(eqId, point){
     var id = point.id;
+    //console.log("weenectCreatePoint :"+eqId+" / "+id)
     if(point.battery){
         jeedom.cmd.update[point.battery.id] = function(_options) {
             weenectUpdateBattery(point.battery.id, _options);

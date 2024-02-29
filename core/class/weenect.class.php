@@ -496,13 +496,14 @@ class weenect extends weenect_base {
     $data['control-zoom'] = ($version == 'dashboard');
     $data['control-attributions'] = ($version == 'dashboard');
     $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 70 : 250;
-
+    $replace['#tracker_id#'] = $this->getLogicalId();
     // tracker info
     $cmd =$this->getCmd(null, 'coord');
     if(is_object($cmd))$replace['#coordonate#'] = "<span id='coord' class='cmd weenect-coord ' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span>";
     $data['tracker']=$this->buildLocation();
     $data['tracker']['color']=config::byKey('tracker-color', __CLASS__)?:self::DEFAULT_TRACKER_COLOR;
-
+    $data['tracker']['heatmap']=false;
+    
     $cmd  =$this->getCmd(null, 'curr_zone_name');
     $zName= is_object($cmd) ? $cmd->execCmd():0;
     $zName = preg_replace('/'.$this->getName().'-/',"",$zName);
