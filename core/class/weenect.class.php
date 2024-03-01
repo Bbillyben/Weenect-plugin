@@ -53,6 +53,10 @@ class weenect extends weenect_base {
 
       //action 
       'refresh'=>array('name'=>'Refresh','type'=>'action', 'subtype'=>'other'),
+      'ask_refresh'=>array('name'=>'Demande mise à jour','type'=>'action', 'subtype'=>'other'),
+      'make_vibrate'=>array('name'=>'Vibration','type'=>'action', 'subtype'=>'other'),
+      'make_ring'=>array('name'=>'Sonnerie','type'=>'action', 'subtype'=>'other'),
+
 
       //date 
       // 'creation_date'=>array('name'=>'Date Creation', 'type'=>'info', 'subtype'=>'string'),
@@ -106,7 +110,12 @@ class weenect extends weenect_base {
   * $api_cmd : la command API , fonction static de la class W_API, qui ne demande que le toke
   * retourne le résultat de la commande, array [status, header, result]
   */
-  public function get_api_data($api_cmd){
+  public static function get_api_data($api_cmd){
+    if (!method_exists('W_API', $api_cmd)) {
+      log::add(__CLASS__, 'error', 'Weenect API commande not found :'.$api_cmd);
+      return;
+    }
+
     log::add(__CLASS__, 'debug', '║ ╟─── Task for api data :'.$api_cmd);
     $token = config::byKey('token', __CLASS__);
     if(!$token){
@@ -115,12 +124,17 @@ class weenect extends weenect_base {
       if(!$token)return False;
     }
     log::add(__CLASS__, 'debug', '║ ╟─── Token  :'.$token);
-    $datas = W_API::$api_cmd($token);
+    $args = array_slice(func_get_args(), 1);
+    $merged_args = array_merge(array($token), $args);
+    log::add(__CLASS__, 'debug', '║ ╟─── merged_args :'.json_encode($merged_args));
+    $datas = call_user_func_array(array('W_API', $api_cmd), $merged_args);
+    // $datas = W_API::$api_cmd($token);
     if(!W_API::test_status($datas['status'])){
       log::add(__CLASS__, 'debug', '║ ╟─── curl status error : '.$datas['status'].' => try update token');
       $token = weenect::update_token();
       if(!$token)return False;
-      W_API::$api_cmd($token);
+      $datas = call_user_func_array(array('W_API', $api_cmd), $merged_args);
+      //  $datas = W_API::$api_cmd($token);
       if(!W_API::test_status($datas['status']))return False;
     }
     return $datas;
@@ -425,6 +439,14 @@ class weenect extends weenect_base {
       }
 
   }
+    /* ------------------------------------------------------------------------
+     -----------------------------------  ACTIONS -----------------------------
+     -------------------------------------------------------------------------- */
+    public function send_action($action_type){{
+      $eqId = $this->getLogicalId();
+      $return = weenect::get_api_data('launch_command', $eqId, $action_type);
+
+    }}
 
     /* --------------------------------------------------------------------------------------
      ------------------------------------  widget personnalisé ------------------------------
@@ -567,6 +589,11 @@ class weenectCmd extends cmd {
       case 'refresh':
         // demande la mise à jour de toutes les position des trackers.
         weenect::update_position();
+        break;
+      case 'ask_refresh':
+      case 'make_vibrate':
+      case 'make_ring':
+        $this->getEqLogic()->send_action($this->getLogicalId());
         break;
       default:
         log::add('weenect','debug', '╠════ Default call');
