@@ -60,7 +60,7 @@ Les information sont récupérées à l'enregistremenet de la configuration du p
 * __Latitude__ : la dernière latitude du tracker
 * __Longitude__ :la dernière longitude  du tracker
 * __Precision__ : la précision en mètre du signal GPS du tracker
-* __Coordonnées__ : les coordonnées sou forme : [latitude],[longitude]
+* __Coordonnées__ : les coordonnées sous forme : [latitude],[longitude]
 
 * __Id Zone Courante__ : identifiant weenect de la zone en cours (0 si hors toutes zones)
 * __Nom Zone Courante__ : nom de la zone occupé par le tracker (0 si hors toutes zones)
@@ -88,23 +88,23 @@ Les information sont récupérées à l'enregistremenet de la configuration du p
 * __Sonnerie__ : envoi la demande de sonnerie vers le tracker
 
 ## Zones 
-onglets présentant les equipement zones attachés au tracker : 
+onglets présentant les equipements zones attachés au tracker : 
 <p align="center">
   <img src="/docs/imgs/zone_tab.png">
 </p>
 l'icone personne passe au vert quand la zone est occupée.
-si vous cliquer sur l'une des zones vous arrivez sur l'équipement de la zone : 
+si vous cliquez sur l'une des zones vous arrivez sur l'équipement de la zone : 
 
 la configuration de zone contient l'identifiant du tracker attaché. 
 
-les commandes informations disponible pour chaque zones sont : 
+les commandes informations disponibles pour chaque zone sont : 
 
 * __Num__ : l'identifiant weenect de la zone
-* __Adresse__ : l'adresse renseigné (si disponible)
+* __Adresse__ : l'adresse renseignée (si disponible)
 * __Latitude__ : la longitude 
 * __Longitude__ :la latitude 
 * __Distance__ : le rayon du cercle de sécurité autour du point de coordonnées latitude,Longitude
-* __Coordonnées__ : les coordonnées sou forme : [latitude],[longitude]
+* __Coordonnées__ : les coordonnées sous forme : [latitude],[longitude]
 * __Dans la Zone__ : sépcifie si le tracker est dans la zone (1) ou hors zone (0)
 
 
@@ -115,7 +115,6 @@ La tuile du plugin pour un équipement affiche une carte de la zone selon les fo
 <p align="center">
   <img src="/docs/imgs/tile.png">
 </p>
-*avec l'historique d'activé*
 
 en haut à gauche de la tuile dashboard, vous avez les trois commande : demande de mise à jour, sonnerie et vibration du tracker
 autour de la carte sont affichés : 
@@ -126,7 +125,7 @@ autour de la carte sont affichés :
 * les coordonnées
 
 l'historique est affiché selon la configuration de l'équipement (Oui/non) et la configuration générale du plugin (durée, couleur)
-Le bouton au centre en bas permet de basculer, quand l'historique est affiché, entre la vue 'tracé' et la vue 'heat mat' de l'historique :
+Le bouton au centre en bas permet de basculer, quand l'historique est affiché, entre la vue 'tracé' et la vue 'heat mat' de celui-ci :
 <p align="center">
   <img src="/docs/imgs/tile_heat.png">
 </p>
