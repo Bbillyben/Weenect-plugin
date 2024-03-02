@@ -154,9 +154,9 @@ $confList = weenect::W_CONF_common;
 								}
 								echo '</label>';
 								echo '<div class="col-sm-6">';
-								echo '<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="';
+								echo '<span class="eqLogicAttr " data-l1key="configuration" data-l2key="';
 								echo $key;
-								echo '" disabled>';
+								echo '" disabled></span>';
 								echo '</div>';
 								echo '</div>';
 

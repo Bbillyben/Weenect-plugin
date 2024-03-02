@@ -330,7 +330,7 @@ class weenect extends weenect_base {
   /**  ----- Mis à des information générales.
   * toutes les 15 minutes
   */
-  public static function cron15() {
+  public static function cronDaily() {
     self::update_general(FALSE);
   }
   /**  ----- utilitaire pour construire un array avec les dates du prochain lancement du cron.
@@ -500,6 +500,21 @@ class weenect extends weenect_base {
     if (is_object($refresh)) {
         $replace['#refresh_id#'] = $refresh->getId();
     }
+    $cmd= $this->getCmd(null, 'make_vibrate');
+    if (is_object($cmd)) {
+        $replace['#vibrate_id#'] = $cmd->getId();
+    }
+    $cmd= $this->getCmd(null, 'make_ring');
+    if (is_object($cmd)) {
+        $replace['#ring_id#'] = $cmd->getId();
+    }
+    $cmd= $this->getCmd(null, 'ask_refresh');
+    if (is_object($cmd)) {
+        $replace['#ask_refresh#'] = $cmd->getId();
+    }
+    
+
+
     $data = array();
     // les fond de carte 
     $mapsBG = self::getMapLayers();

@@ -3,14 +3,28 @@
     <span class="warning" title="#alert_name#">
       <i class='#alert_icon#'></i>
     </span>
-        <span style="position:relative" class="cmd refresh pull-right cursor" data-cmd_id="#refresh_id#">
+   
+    <span style="position:relative" class="cmd weenect-cmd pull-right cursor" data-cmd_id="#refresh_id#">
       <i class="fas fa-sync"></i>
     </span>
-        <span class="reportModeVisible">#name_display# <span class="object_name">#object_name#</span></span>
-        <a href="#eqLink#" class="reportModeHidden">#name_display# <span class="object_name">#object_name#</span></a>
+    <span class="weenect-cmd-cont">
+        <span style="position:relative" class="cmd weenect-cmd ring pull-left cursor" data-cmd_id="#ask_refresh#">
+            <i class="fas fa-map-marked-alt" title="{{Demande de mise à jour de la position}}"></i>
+        </span>
+        <span style="position:relative" class="cmd weenect-cmd ring pull-left cursor" data-cmd_id="#ring_id#">
+            <i class="fas fa-bell" title="{{Faire sonner le tracker}}"></i>
+        </span>
+        <span style="position:relative" class="cmd weenect-cmd vibrate pull-left cursor" data-cmd_id="#vibrate_id#">
+            <i class="fas fa-cube" title="{{Faire vibrer le tracker}}"></i>
+        </span>
+    </span>
+
+    
+    <span class="reportModeVisible">#name_display# <span class="object_name">#object_name#</span></span>
+    <a href="#eqLink#" class="reportModeHidden">#name_display# <span class="object_name">#object_name#</span></a>
     </center>
     <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">
-            <div class="col-sm-4"><span class="cmd" data-cmd_id="#tracker_id#">#last_seen#</span></div>
+            <div class="col-sm-4"><span class="" data-cmd_id="#tracker_id#">#last_seen#</span></div>
             <div class="col-sm-4 text-center">#current_zone#</div>
             <div class="col-sm-4 text-right">#tracker_battery#</div>
     </div>
@@ -21,12 +35,15 @@
     </div> 
     <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">
         <div class="col-sm-4"> <div class="weenect-accuracy">#accuracy#</div></div>
-        <div class="col-sm-4 text-center"> <div class="weenect_toggle weenect-heat" style="display:none;">
-            <label class="switch">
-                <input type="checkbox">
-                <span class="slider round"></span>
-            </label>
-        </div></div>
+        <div class="col-sm-4 text-center"> 
+            <div class="weenect_toggle weenect-heat" style="display:none;">
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+                <span>Heat Map</span>
+            </div>
+        </div>
         <div class="col-sm-4 text-right">#coordonate#</div>
         
     </div>
@@ -56,19 +73,49 @@
         #weenect-address-#tracker_id# .weenect-address{
             font-size:12px !important;
         }
+
+        /* for weenect cmd */
+        .weenect-cmd-cont .weenect-cmd:first-child{
+            margin-left:0px !important;
+        }
+        .weenect-cmd-cont .weenect-cmd{
+            margin-left:8px;
+        }
+        .weenect-cmd{
+            position: relative;
+            margin-top: 5px !important;
+            right: 0;
+
+            color: var(--link-color) !important;
+            font-size: 12px;
+            line-height: 12px;
+        }
     </style>
     <script src="plugins/weenect/3rdparty/leaflet.js"></script>
     <script src="plugins/weenect/3rdparty/heatlayer.js"></script>
     <script src="plugins/weenect/core/template/weenect.template.js"></script>
     <script type="text/javascript">
-    
-        if ('#refresh_id#' != ''){
-            $('.eqLogic[data-eqLogic_uid=#uid#] .refresh').on('click', function () {
-                jeedom.cmd.execute({id: '#refresh_id#'});
-            });
-        }else{
-            $('.eqLogic[data-eqLogic_uid=#uid#] .refresh').remove();
+        
+        $('.eqLogic[data-eqLogic_uid=#uid#] .weenect-cmd').each(function(e){
+            if(!isNaN($(this).data("cmd_id"))){
+                $(this).on('click', function () {
+                    jeedom.cmd.execute({id: $(this).data("cmd_id"), notify: false});
+                    weenect_notify('#uid#', $(this).data("cmd_id"));
+                });
+            }else{
+                $(this).remove();
+            }
+
+        });
+        function weenect_notify(uid, cmdId){
+            var elt = $('.eqLogic[data-eqLogic_uid=#uid#] .weenect-cmd[data-cmd_id="'+cmdId+'"]');
+            elt.addClass('refresh').addClass('spinning');
+            setTimeout(function() {
+                    elt.removeClass('spinning').removeClass('refresh')
+            }, 1000)
         }
+
+
         var data#tracker_id#=JSON.parse('#json#');
         var trackerName='#name_display#';
         
