@@ -21,12 +21,13 @@ Le plugin récupère automatiquement les information de vos tracker et zones aff
 ## autre paramètres de configuration
 
 ### général 
-* fréquence de mise à jour : fréquence à laquelle le plugin va chercher les positions des trackers sur le serveur de weenect.
-> warning: ! définir sur manuel, vous devrez appeler une commande "refresh" d'un des équipement pour mettre à jour les positions !
-sur custom, vous pouvez définir une fréquence par une syntaxe cron. vous pouvez vous servir du générateur cron de jeedom disponible via le bouton '?' sur le coté du champs.
+* __fréquence de mise à jour__ : fréquence à laquelle le plugin va chercher les positions des trackers sur le serveur de weenect.
+> ::warning:: ! définir sur manuel, vous devrez appeler une commande "refresh" d'un des équipement pour mettre à jour les positions !
+
+>sur custom, vous pouvez définir une fréquence par une syntaxe cron. vous pouvez vous servir du générateur cron de jeedom disponible via le bouton >'?' sur le coté du champs.
 
 ### Paramètres Zones
-* Ajouter le nom du tracker à celui des zones : le nom des zones est récupérer sur le serveur weenect. Si activé, les zones seront alors nommées [nom du tracker]-[nom de la zone], pour vous permettre de les retrouver rapidement dans les selecteur jeedom. vous pouvez le désactiver, et aller dans chaque zone pour les renommer individuellement.
+* __Ajouter le nom du tracker à celui des zones__ : le nom des zones est récupérer sur le serveur weenect. Si activé, les zones seront alors nommées [nom du tracker]-[nom de la zone], pour vous permettre de les retrouver rapidement dans les selecteur jeedom. vous pouvez le désactiver, et aller dans chaque zone pour les renommer individuellement.
 
 * Lier la configuration des zones au tracker  : si activé, les objets parents des zones seront synchronisé avec celui du tracker, ainsi que les catégories.
 
@@ -76,14 +77,13 @@ Les information sont récupérées à l'enregistremenet de la configuration du p
 
 * __type__ : type du tracker
 
-
 * __Valid Signal__ : un paramètre signal valide renvoyé par le tracker? 
 * __Deepsleep__ : si le tracker est en veille prolongée
 
-### commande
+### commandes
 
 * __Refresh__ : mise à jour des données par l'interrogation du serveur weenect
-* __Demande mise à jour__ : envoi la commande de demande de mise à jour des position vers le tracker
+* __Demande mise à jour__ : envoi la commande de demande de mise à jour des positions vers le tracker
 * __Vibration__ : envoi la demande de vibration vers le tracker
 * __Sonnerie__ : envoi la demande de sonnerie vers le tracker
 
