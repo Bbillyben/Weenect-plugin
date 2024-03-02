@@ -1,7 +1,7 @@
 {
 	"id": "weenect",
 	"name": "Weenect",
-	"pluginVersion": "0.1",
+	"pluginVersion": "0.5",
 	"specialAttributes": {
 		"object": {
 		},
@@ -24,8 +24,7 @@
 	"documentation_beta": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/tree\/master\/docs\/fr_FR",
 	"documentation": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/tree\/master\/docs\/fr_FR",
 	"link": {
-		"forum": "Lien vers le forum",
-		"video": "Lien vers une video"
+		"forum": "Lien vers le forum"
 	},
 	"language": [
 		"fr_FR",
