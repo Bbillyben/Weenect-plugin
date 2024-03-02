@@ -10,44 +10,44 @@
 			<span>#name_display# <span class="object_name">#object_name#</span></span><br/>
 		</span>
     </center>
-    <div class="row weenect-#id#" style="margin-right:0px;margin-left:0px;display:flex;">
-            <div class="col-sm-4"><span class="cmd" data-cmd_id="#id#">#last_seen#</span></div>
+    <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">
+            <div class="col-sm-4"><span class="cmd" data-cmd_id="#tracker_id#">#last_seen#</span></div>
             <div class="col-sm-4 text-center">#current_zone#</div>
             <div class="col-sm-4 text-right">#tracker_battery#</div>
     </div>
-    <div class="row weenect-#id#" style="margin-right:0px;margin-left:0px;">
+    <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;">
         <div class="col-sm-12">
-            <div class="weenect" id="map_#id#"></div>
+            <div class="weenect" id="map_#tracker_id#"></div>
         </div>
     </div> 
-    <div class="row weenect-#id#" style="margin-right:0px;margin-left:0px;display:flex;">
+    <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">
         <div class="col-sm-6"> <div class="weenect-accuracy">#accuracy#</div></div>
         <div class="col-sm-6 text-right">#coordonate#</div>
         
     </div>
     <link rel="stylesheet" href="plugins/weenect/3rdparty/leaflet.css"/> 
     <style>
-        #map_#id#.weenect {
+        #map_#tracker_id#.weenect {
             width: 100%;
             height: #height-map#px;
         }
-        #map_#id#.weenect .leaflet-marker-icon {
+        #map_#tracker_id#.weenect .leaflet-marker-icon {
             border-radius: 50% !important;
         }
-        .weenect-#id# .weenect-precision,
-        .weenect-#id# .weenect-horodatage,
-        .weenect-#id# .weenect-battery,
-        .weenect-#id# .weenect-coord{
+        .weenect-#tracker_id# .weenect-precision,
+        .weenect-#tracker_id# .weenect-horodatage,
+        .weenect-#tracker_id# .weenect-battery,
+        .weenect-#tracker_id# .weenect-coord{
             font-size:10px !important;
         }
-        .weenect-#id# .weenect-battery-icon {
+        .weenect-#tracker_id# .weenect-battery-icon {
             margin-right: 5px;
         }
-        .weenect-#id# .weenect-current{
+        .weenect-#tracker_id# .weenect-current{
             font-weight: bold;
         }
 
-        #weenect-address-#id# .weenect-address{
+        #weenect-address-#tracker_id# .weenect-address{
             font-size:12px !important;
         }
     </style>
@@ -63,22 +63,22 @@
         }else{
             $('.eqLogic[data-eqLogic_uid=#uid#] .refresh').remove();
         }
-        var data#id#=JSON.parse('#json#');
+        var data#tracker_id#=JSON.parse('#json#');
         var trackerName='#name_display#';
 
-        weenectSetTheme(data#id#['light-theme'], data#id#['dark-theme']);
-        weenectCreateMap(#id#, data#id#['control-attributions'], data#id#['control-zoom']);
-        weenectObjects.maps[#id#].customZoom = parseInt('#zoom#');
+        weenectSetTheme(data#tracker_id#['light-theme'], data#tracker_id#['dark-theme']);
+        weenectCreateMap(#tracker_id#, data#tracker_id#['control-attributions'], data#tracker_id#['control-zoom']);
+        weenectObjects.maps[#tracker_id#].customZoom = parseInt('#zoom#');
 
         
-        weenectCreateMarker(#id#, data#id#.tracker);
-        weenectCreatePoint(#id#, data#id#.tracker);
+        weenectCreateMarker(#tracker_id#, data#tracker_id#.tracker);
+        weenectCreatePoint(#tracker_id#, data#tracker_id#.tracker);
         // for zones
-        for(id in data#id#.zones){
-            weenectCreateMarker(#id#, data#id#.zones[id]);
+        for(id in data#tracker_id#.zones){
+            weenectCreateMarker(#tracker_id#, data#tracker_id#.zones[id]);
         }
-        weenectFocusFeatureGroup(#id#);
-        weenectMapLoaded(#id#);
+        weenectFocusFeatureGroup(#tracker_id#);
+        weenectMapLoaded(#tracker_id#);
     </script>
 
 

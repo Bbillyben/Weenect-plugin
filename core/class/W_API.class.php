@@ -9,9 +9,12 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class W_API {
     // URLS :
-    PRIVATE CONST LOGIN_URL = 'https://apiv4.weenect.com/v4/user/login'; // login 
+    PRIVATE CONST LOGIN_URL = 'https://apiv4.weenect.com/v4/user/login'; // login  data : {'username':'my_username', 'password':'my_password'}
     PRIVATE CONST TRACKER_POSITION_URL = 'https://apiv4.weenect.com/v4/mytracker-userspace/position'; // les position de tous les tracker
     PRIVATE CONST TRACKER_DATA_URL = 'https://apiv4.weenect.com/v4/mytracker-userspace'; // les information sur les tracker (date, zones, ...)
+    PRIVATE CONST TRAKCER_POS_REFRESH = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/position/refresh'; // demande du refresh de la position / POST
+    PRIVATE CONST TRAKCER_VIBRATE = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/vibrate'; // demande du vibrate / OPTION
+    PRIVATE CONST TRAKCER_RING = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/ring'; // demande du ring / POST
 
     /* --------- Récupération du Token par login du user
     * retourne : String Token
@@ -53,6 +56,38 @@ class W_API {
         // W_API::printData($dataCmd);
         return $dataCmd;
     }
+
+    /* --------- Envoi de commande au tracker (refresh position, vibrate et ring) en POST
+    * retourne : un array multidimensionnel avec le heder => status 204 / NO content
+    * $token : token d'authentification
+    * $eqId : l'id du tracker auquel envoyer la commande
+    * $cmd : le type de la commande (cf switch/case)
+    */
+    public static function launch_command($token, $eqId, $cmd){
+        log::add('weenect', 'debug', '║ ╟───  launch_command :'.$cmd.' for eqId :'.$eqId);
+        switch($cmd){
+            case 'ask_refresh':
+                $url=static::TRAKCER_POS_REFRESH;
+                break;
+            case 'make_vibrate':
+                $url=static::TRAKCER_VIBRATE;
+                break; 
+            case 'make_ring':
+                $url=static::TRAKCER_RING;
+                break;   
+        }
+        if(!$url){
+            log::add('weenect', 'error', 'ERROR, tracker command not found :'.$cmd);
+            return False;
+        }
+        $cmdUrl = str_replace('#tracker_id#', $eqId, $url);
+        log::add('weenect', 'debug', '║ ╟───  Commande URL :'.$cmdUrl);
+
+        $dataCmd=W_API::computeCMD($cmdUrl, $token, Null, "POST");
+        // W_API::printData($dataCmd);
+        return $dataCmd;
+    }
+
     /* --------- Utilitaire d'execution des commande API
     * retourne un array avec status, header et result de la réponse
     * $cmd : la commande a executer (URL)
@@ -147,6 +182,7 @@ class W_API {
         log::add('weenect','debug','║ ╟══ test status :'.$status_code);
         switch ($status_code) {
             case 200:
+            case 204:
                 return True;
             case 401:
                 log::add('weenect','debug','║ ╟══ #################### ERROR  :'.$status_code);

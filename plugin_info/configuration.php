@@ -68,7 +68,7 @@ $themes = weenect::getMapLayers();
       <label class="col-md-4 control-label">{{Auto-actualisation}}
         <sup><i class="fas fa-question-circle tooltips" title="{{Fréquence de rafraîchissement de l'équipement}}"></i></sup>
       </label>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="input-group">
           <input type="text" class="configKey form-control roundedLeft" data-l1key="autorefresh" placeholder="{{Cliquer sur ? pour afficher l'assistant cron}}"/>
           <span class="input-group-btn">
@@ -162,7 +162,6 @@ $themes = weenect::getMapLayers();
           </label>
           <div class="col-md-3">
             <select id="freq_selector" class="configKey form-control" data-l1key="history_duration">
-              <option value="0.5">30 {{minutes}}</option>
               <option value="1">1 {{heure}}</option>
               <option value="3">3 {{heure}}</option>
               <option value="12">12 {{heure}}</option>
