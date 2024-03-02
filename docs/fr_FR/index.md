@@ -43,7 +43,7 @@ les équipements sont créés automatiquement à la récupération des informati
 Les information sont récupérées à l'enregistremenet de la configuration du plugin, et tous les jours.
 
 <p align="center">
-  <img width="100" src="/docs/imgs/equipement.png">
+  <img src="/docs/imgs/equipement.png">
 </p>
 
 ## configuration 
@@ -90,7 +90,7 @@ Les information sont récupérées à l'enregistremenet de la configuration du p
 ## Zones 
 onglets présentant les equipement zones attachés au tracker : 
 <p align="center">
-  <img width="100" src="/docs/imgs/zone_tab.png">
+  <img src="/docs/imgs/zone_tab.png">
 </p>
 l'icone personne passe au vert quand la zone est occupée.
 si vous cliquer sur l'une des zones vous arrivez sur l'équipement de la zone : 
@@ -113,7 +113,7 @@ les commandes informations disponible pour chaque zones sont :
 La tuile du plugin pour un équipement affiche une carte de la zone selon les fonds de cartes et couleurs spécifiés dans la configuration de l'équipement.
 
 <p align="center">
-  <img width="100" src="/docs/imgs/tile.png">
+  <img src="/docs/imgs/tile.png">
 </p>
 *avec l'historique d'activé*
 
@@ -128,7 +128,7 @@ autour de la carte sont affichés :
 l'historique est affiché selon la configuration de l'équipement (Oui/non) et la configuration générale du plugin (durée, couleur)
 Le bouton au centre en bas permet de basculer, quand l'historique est affiché, entre la vue 'tracé' et la vue 'heat mat' de l'historique :
 <p align="center">
-  <img width="100" src="/docs/imgs/tile_heat.png">
+  <img src="/docs/imgs/tile_heat.png">
 </p>
 
 
