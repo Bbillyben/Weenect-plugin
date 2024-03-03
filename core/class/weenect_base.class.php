@@ -81,9 +81,8 @@ class weenect_base extends eqLogic {
         $isOk=true;
         if (is_object($wCMD)) {
           // log::add(self::$__CUR_CLASS__, 'debug', "║ ║ ╟─ update commande $logId to $val");
-          $wCMD->event($val);
-          $wCMD->save();
-          // $isOk = $this->checkAndUpdateCmd($wCMD->getLogicalId(),$val) && $isOk;
+          $isOk = $this->checkAndUpdateCmd($cmdlogId, $val) && $isOk;
+          //  $this->checkAndUpdateCmd($wCMD->getLogicalId(),$val) && $isOk;
         }
     }
     return $isOk;
@@ -127,8 +126,7 @@ class weenect_base extends eqLogic {
     $longCMD = $this->getCmd(null, "longitude");
     if(is_object($latCMD) && is_object($longCMD)){
       $coord = $latCMD->execCmd() . "," . $longCMD->execCmd();
-      $wCMD->event($coord);
-      $wCMD->save();
+      $this->checkAndUpdateCmd( "coord", $coord);
     }
   }
 
