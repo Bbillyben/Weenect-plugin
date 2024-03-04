@@ -1,7 +1,7 @@
 {
 	"id": "weenect",
 	"name": "Weenect",
-	"pluginVersion": "0.5",
+	"pluginVersion": "1.0",
 	"specialAttributes": {
 		"object": {
 		},
@@ -19,10 +19,10 @@
 	"hasDependency": false,
 	"hasOwnDeamon": false,
 	"maxDependancyInstallTime": 0,
-	"changelog_beta": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/blob\/master\/docs\/fr_FR\/changelog_beta.md",
-	"changelog": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/blob\/master\/docs\/fr_FR\/changelog.md",
-	"documentation_beta": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/tree\/master\/docs\/fr_FR",
-	"documentation": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/tree\/master\/docs\/fr_FR",
+	"changelog_beta": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/blob\/master\/docs\/changelog_beta.md",
+	"changelog": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/blob\/master\/docs\/changelog.md",
+	"documentation_beta": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/tree\/master\/docs\/#language#\/index.md",
+	"documentation": "https:\/\/github.com\/Bbillyben\/Weenect-plugin\/tree\/master\/docs\/#language#\/index.md",
 	"link": {
 		"forum": "Lien vers le forum"
 	},

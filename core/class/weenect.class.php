@@ -371,8 +371,7 @@ class weenect extends weenect_base {
     // mise à jour de la commande coord : String latitude,longitude
     $this->update_coordinate(self::W_CMD_common['coord']);
     // mise à jour de la position du tracker dans une zone
-    $this->updateCurrentZone();
-    
+    $this->updateCurrentZone();    
   }
 
   // Fonction exécutée automatiquement avant la suppression de l'équipement
@@ -423,7 +422,7 @@ class weenect extends weenect_base {
           if($rad >= $dist){
             
             $this->checkAndUpdateCmd('curr_zone_id', $zone->getLogicalId());
-            $this->checkAndUpdateCmd('curr_zone_name', $zone->getName());
+            $this->checkAndUpdateCmd('curr_zone_name', $this->get_clean_zonename($zone->getName()));
             $zone->checkAndUpdateCmd('is_in', 1);
             $found = true;
           }else{
@@ -436,14 +435,16 @@ class weenect extends weenect_base {
       }
 
   }
+  public function get_clean_zonename($zName){
+    return preg_replace('/'.$this->getName().'-/',"",$zName);
+  }
     /* ------------------------------------------------------------------------
      -----------------------------------  ACTIONS -----------------------------
      -------------------------------------------------------------------------- */
-    public function send_action($action_type){{
+    public function send_action($action_type){
       $eqId = $this->getLogicalId();
       $return = weenect::get_api_data('launch_command', $eqId, $action_type);
-
-    }}
+    }
 
     /* --------------------------------------------------------------------------------------
      ------------------------------------  widget personnalisé ------------------------------
@@ -580,8 +581,12 @@ class weenect extends weenect_base {
 
     $replace['#json#'] = str_replace("'", "\'", json_encode($data));
     // renvoi du template
+    $tempFile = getTemplate('core', $version, 'weenect_tile', 'weenect');
+    $html = $this->postToHtml($_version, template_replace($replace,$tempFile));
+    log::add(__CLASS__, "debug", "translate html : ". 'plugins/weenect/core/template/' . $version . '/weenect_tile.html');
+    $html = translate::exec($html, 'plugins/weenect/core/template/' . $version . '/weenect_tile.html');
   
-    return $this->postToHtml($_version, template_replace($replace, getTemplate('core', $version, 'weenect_tile', 'weenect')));
+    return $html;
   }
 
   
@@ -592,6 +597,18 @@ class weenect extends weenect_base {
 
 class weenectCmd extends cmd {
 
+  public function preSave(){
+      if($this->getLogicalId()=='coord'){
+        //Gestion de l'historisation si l'équipement a coché "affciher l'historique" en configuration
+        $show_hist = $this->getEqLogic()->getConfiguration("show_history");
+        $vmd_isHis = $this->getIsHistorized();
+        if($show_hist && !$vmd_isHis){
+          log::add("weenect", "debug", "║ ╟─── Ask to show history on widget but coord cmd not historized => activate history (1 month by default if none)");
+          $this->setIsHistorized(True);
+          if( $this->getConfiguration("historyPurge")=="")$this->setConfiguration("historyPurge", "-1 month");
+        }
+      }
+  }
   // Exécution d'une commande
   public function execute($_options = array()) {
     log::add('weenect','debug', "╔═══════════════════════ execute CMD : ".$this->getId()." | ".$this->getHumanName().", logical id : ".$this->getLogicalId() ."  options : ".json_encode($_options));

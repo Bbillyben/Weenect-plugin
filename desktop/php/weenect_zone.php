@@ -88,7 +88,7 @@ $confList = weenect_zone::WZ_CONF_common;
 								if(array_key_exists('hidden', $param))echo 'hidden=';
 								echo '>';
 								echo '<label class="col-sm-4 control-label">';
-								echo $param['name'];
+								echo __($param['name'], "weenect_trans");
 								if($param['info']){
 									echo '<sup><i class="fas fa-question-circle tooltips" title="';
 									echo $param['info'];
