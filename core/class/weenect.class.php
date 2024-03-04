@@ -418,24 +418,21 @@ class weenect extends weenect_base {
           $zRad = (is_object($zRadCmd)?$zRadCmd->execCmd():0);
           $dist = self::distance($tPos, $zPos);
           $rad =  $tRad + $zRad;
-          log::add(__CLASS__, 'debug', 'dist calc - '.$zone->getName()." # pos :".$zPos." radius : ".$rad );
-          log::add(__CLASS__, 'debug', 'dist = '.$dist);
+          // log::add(__CLASS__, 'debug', 'dist calc - '.$zone->getName()." # pos :".$zPos." radius : ".$rad );
+          // log::add(__CLASS__, 'debug', 'dist = '.$dist);
           if($rad >= $dist){
-            $zIdcmd =$this->getCmd(null, 'curr_zone_id');
-            if(is_object($zIdcmd))$zIdcmd->event($zone->getLogicalId());
-            $zNamecmd =$this->getCmd(null, 'curr_zone_name');
-            if(is_object($zNamecmd))$zNamecmd->event($zone->getName());
-            if(is_object($in))$in->event(1);
+            
+            $this->checkAndUpdateCmd('curr_zone_id', $zone->getLogicalId());
+            $this->checkAndUpdateCmd('curr_zone_name', $zone->getName());
+            $zone->checkAndUpdateCmd('is_in', 1);
             $found = true;
           }else{
-            if(is_object($in))$in->event(0);
+            $zone->checkAndUpdateCmd('is_in', 0);
           }
       }
       if(!$found){
-        $zIdcmd =$this->getCmd(null, 'curr_zone_id');
-        if(is_object($zIdcmd))$zIdcmd->event(0);
-        $zNamecmd =$this->getCmd(null, 'curr_zone_name');
-        if(is_object($zNamecmd))$zNamecmd->event(null);
+        $this->checkAndUpdateCmd('curr_zone_id',0);
+        $this->checkAndUpdateCmd('curr_zone_name', 0);
       }
 
   }
