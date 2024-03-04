@@ -61,7 +61,7 @@ $themes = weenect::getMapLayers();
 
           <option value="prog">{{Custom}}</option>
         </select>
-        <span class="warning_manualupdate" style="color: orange;">le rafraichissements des données ne sera effectué qu'avec l'appel à la commande 'rafraichir'</span>
+        <span class="warning_manualupdate" style="color: orange;">{{le rafraichissements des données ne sera effectué qu'avec l'appel à la commande 'rafraichir'}}</span>
       </div>
     </div>
     <div class="form-group mgh-actu-auto">
@@ -102,7 +102,7 @@ $themes = weenect::getMapLayers();
         </div>
     </div>
     <div class="form-group">
-            <label class="col-lg-4 control-label">{{Lier la configuration des zones au tracker }}
+            <label class="col-lg-4 control-label">{{Lier la configuration des zones au tracker}}
             <sup><i class="fas fa-question-circle tooltips" title="{{object parent, catégories}}"></i></sup>
             </label>
             <div class="col-lg-4">
@@ -169,7 +169,6 @@ $themes = weenect::getMapLayers();
               <option value="72">3 {{jour}}</option>
               <option value="84">1 {{semaine}}</option>
             </select>
-            <span class="warning_manualupdate" style="color: orange;">le rafraichissements des données ne sera effectué qu'avec l'appel à la commande 'rafraichir'</span>
           </div>
         </div>
   </fieldset>

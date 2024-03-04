@@ -21,23 +21,26 @@
         </div>
     </div> 
     <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">
-        <div class="col-sm-6"> <div class="weenect-accuracy">#accuracy#</div></div>
+        <div class="col-sm-4"><span class="weenect-gen">{{Précision}} : <span class="weenect-accuracy">#accuracy#</span> m</span></div>
         <div class="col-sm-6 text-right">#coordonate#</div>
         
     </div>
     <link rel="stylesheet" href="plugins/weenect/3rdparty/leaflet.css"/> 
+    <link rel="stylesheet" href="plugins/weenect/3rdparty/weenect_tile.css"/>
     <style>
-        #map_#tracker_id#.weenect {
+       #map_#tracker_id#.weenect {
             width: 100%;
             height: #height-map#px;
         }
         #map_#tracker_id#.weenect .leaflet-marker-icon {
             border-radius: 50% !important;
         }
+        
         .weenect-#tracker_id# .weenect-precision,
         .weenect-#tracker_id# .weenect-horodatage,
         .weenect-#tracker_id# .weenect-battery,
-        .weenect-#tracker_id# .weenect-coord{
+        .weenect-#tracker_id# .weenect-coord,
+        .weenect-#tracker_id# .weenect-gen{
             font-size:10px !important;
         }
         .weenect-#tracker_id# .weenect-battery-icon {
@@ -50,9 +53,27 @@
         #weenect-address-#tracker_id# .weenect-address{
             font-size:12px !important;
         }
+
+        /* for weenect cmd */
+        .weenect-cmd-cont .weenect-cmd:first-child{
+            margin-left:0px !important;
+        }
+        .weenect-cmd-cont .weenect-cmd{
+            margin-left:8px;
+        }
+        .weenect-cmd{
+            position: relative;
+            margin-top: 5px !important;
+            right: 0;
+
+            color: var(--link-color) !important;
+            font-size: 12px;
+            line-height: 12px;
+        }
     </style>
     
     <script src="plugins/weenect/3rdparty/leaflet.js"></script>
+    <script src="plugins/weenect/3rdparty/heatlayer.js"></script>
     <script src="plugins/weenect/core/template/weenect.template.js"></script>
     <script type="text/javascript">
     

@@ -132,7 +132,7 @@ $confList = weenect::W_CONF_common;
 							<legend><i class="fas fa-map-marked-alt"></i> {{Widget}}</legend>
 							<div class="form-group">
 								<label class="col-sm-4 control-label">{{Afficher l'historique}}
-								<sup><i class="fas fa-question-circle tooltips" title="Affiche l'historique du tracker selon le temps défini dans la configuration du plugin"></i></sup>
+								<sup><i class="fas fa-question-circle tooltips" title="{{Affiche l'historique du tracker selon le temps défini dans la configuration du plugin}}"></i></sup>
 								</label>
 								<div class="col-sm-6">
 									<input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="show_history" checked>
@@ -146,7 +146,7 @@ $confList = weenect::W_CONF_common;
 								if(array_key_exists('hidden', $param))echo 'hidden=';
 								echo '>';
 								echo '<label class="col-sm-4 control-label">';
-								echo $param['name'];
+								echo __($param['name'], __FILE__);
 								if($param['info']){
 									echo '<sup><i class="fas fa-question-circle tooltips" title="';
 									echo $param['info'];

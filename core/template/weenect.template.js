@@ -162,7 +162,7 @@ function weenectUpdateCurrentZone(id, _options){
 function weenectUpdateAccuracy(id, _options){
     var cmd = $('.cmd.weenect-precision[data-cmd_id='+id+']');
     if(_options.display_value){
-        cmd.empty().append('Précision : ' + _options.display_value + 'm');
+        cmd.empty().append(_options.display_value);
     }else{
         cmd.empty();
     }

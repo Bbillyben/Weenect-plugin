@@ -20,7 +20,7 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class weenect_base extends eqLogic {
   
-    public static $__CUR_CLASS__ = "none";
+    public static $__CUR_CLASS__ = "weenect";
 
     function __construct() {
         self::$__CUR_CLASS__='weenect'; //get_class($this);
@@ -34,14 +34,15 @@ class weenect_base extends eqLogic {
     * contenant les données name, type et subtype
  */
  public function createCMDFromArray($arrayCMD){
+  log::add("weenect", "debug", ">>> weenect createCMDFromArray ".__FILE__);
   foreach($arrayCMD as $logId => $setting){
       $wCMD = $this->getCmd(null, $logId);
       if (!is_object($wCMD)) {
-      $wCMD = new cmd();
-      $wCMD->setLogicalId($logId);
-      $wCMD->setIsVisible(1);
-      $wCMD->setName(__($setting['name'], __FILE__));
-      log::add(self::$__CUR_CLASS__, 'debug', "╟─ creation de la commande : ".$setting['name']." - $logId  de type : ".$setting['type'].'|'.$setting['subtype']);
+        $wCMD = new cmd();
+        $wCMD->setLogicalId($logId);
+        $wCMD->setIsVisible(1);
+        $wCMD->setName(__($setting['name'], __FILE__));
+        log::add(self::$__CUR_CLASS__, 'debug', "╟─ creation de la commande : '".__($setting['name'], __FILE__)."' - $logId  de type : ".$setting['type'].'|'.$setting['subtype']);
       }
       $wCMD->setType($setting['type']);
       $wCMD->setSubType($setting['subtype']);

@@ -34,14 +34,14 @@
         </div>
     </div> 
     <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">
-        <div class="col-sm-4"> <div class="weenect-accuracy">#accuracy#</div></div>
+        <div class="col-sm-4"><span class="weenect-gen">{{Précision}} : <span class="weenect-accuracy">#accuracy#</span> m</span></div>
         <div class="col-sm-4 text-center"> 
             <div class="weenect_toggle weenect-heat" style="display:none;">
                 <label class="switch">
                     <input type="checkbox">
                     <span class="slider round"></span>
                 </label>
-                <span>Heat Map</span>
+                <span class="weenect-gen">{{Heat Map}}</span>
             </div>
         </div>
         <div class="col-sm-4 text-right">#coordonate#</div>
@@ -57,10 +57,12 @@
         #map_#tracker_id#.weenect .leaflet-marker-icon {
             border-radius: 50% !important;
         }
+        
         .weenect-#tracker_id# .weenect-precision,
         .weenect-#tracker_id# .weenect-horodatage,
         .weenect-#tracker_id# .weenect-battery,
-        .weenect-#tracker_id# .weenect-coord{
+        .weenect-#tracker_id# .weenect-coord,
+        .weenect-#tracker_id# .weenect-gen{
             font-size:10px !important;
         }
         .weenect-#tracker_id# .weenect-battery-icon {
