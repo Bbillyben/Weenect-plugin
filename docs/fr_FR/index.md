@@ -8,28 +8,28 @@ La tuile du plugin représente un carte avec la position du tracker et des zones
 
 Seules les commande de demande de mise à jour de la position, faire sonner et faire vibrer sont disponible.
 
-Le plugin récupère automatiquement les information de vos tracker et zones affiliées. Chaque tracker et zones sont des équipements individuels, ce qui vous permettra de les retrouver rapidement dans les différents selecteur de jeedom, selon la nomenclature classique.
+Le plugin récupère automatiquement les informations de vos trackers et zones affiliées. Chaque tracker et zones sont des équipements individuels, ce qui vous permettra de les retrouver rapidement dans les différents selecteurs de jeedom, selon la nomenclature classique.
 
 # Configuration
   
   1. activer le plugin
-  2. renseigner le nom d'utilisateur  ainsi que le mot de passe dans les champs prévu dans la configuration.
+  2. renseignez le nom d'utilisateur  ainsi que le mot de passe dans les champs prévus dans la configuration.
   vous pouvez cliquer sur le boutons "get token" qui ira chercher un token de connexion, et donc vérifiera celle-ci par la même.
 
-  A la sauvegarde, le plugin récupèrera les information de votre compte weenect et créera automatiquement les équipements.
+  A la sauvegarde, le plugin récupèrera les informations de votre compte weenect et créera automatiquement les équipements.
 
 ## autre paramètres de configuration
 
 ### général 
 * __fréquence de mise à jour__ : fréquence à laquelle le plugin va chercher les positions des trackers sur le serveur de weenect.
-> ::warning:: ! définir sur manuel, vous devrez appeler une commande "refresh" d'un des équipement pour mettre à jour les positions !
+> ::warning:: ! définir sur manuel, vous devrez appeler une commande "refresh" d'un des équipements pour mettre à jour les positions !
 
 >sur custom, vous pouvez définir une fréquence par une syntaxe cron. vous pouvez vous servir du générateur cron de jeedom disponible via le bouton >'?' sur le coté du champs.
 
 ### Paramètres Zones
-* __Ajouter le nom du tracker à celui des zones__ : le nom des zones est récupérer sur le serveur weenect. Si activé, les zones seront alors nommées [nom du tracker]-[nom de la zone], pour vous permettre de les retrouver rapidement dans les selecteur jeedom. vous pouvez le désactiver, et aller dans chaque zone pour les renommer individuellement.
+* __Ajouter le nom du tracker à celui des zones__ : les noms des zones sont récupérés sur le serveur weenect. Si activé, les zones seront alors nommées [nom du tracker]-[nom de la zone], pour vous permettre de les retrouver rapidement dans les selecteurs jeedom. vous pouvez le désactiver, et aller dans chaque zone pour les renommer individuellement.
 
-* Lier la configuration des zones au tracker  : si activé, les objets parents des zones seront synchronisé avec celui du tracker, ainsi que les catégories.
+* Lier la configuration des zones au tracker  : si activé, les équipements zones seront synchronisés avec celui du tracker, ainsi que les catégories.
 
 ### Paramètre du Widget
 pour gérer les paramètres liés aux tuiles/carte 
@@ -37,11 +37,11 @@ pour gérer les paramètres liés aux tuiles/carte
 * Couleurs : permet de choisir les couleurs pour le tracker, et pour les zones
 * Afficher l'épingle de zone : pour afficher ou non une 'épingle' sur les zones de sécurités, en plus du cercle de sécurité
 * Fond cartographique thème light/dark : vous permet de choisir les fonds de cartes pour les thèmes light et dark
-* Durée de l'historique : permet de selectionné la durée de l'historique affiché sur les tuiles. l'affichage de l'historique est géré dans les configurations de chaque équipement tracker.
+* Durée de l'historique : permet de selectionner la durée de l'historique affiché sur les tuiles. l'affichage de l'historique est géré dans les configurations de chaque équipement tracker.
 
 # Equipement
-les équipements sont créés automatiquement à la récupération des information sur le serveur weenect.
-Les information sont récupérées à l'enregistremenet de la configuration du plugin, et tous les jours.
+les équipements sont créés automatiquement à la récupération des informations sur le serveur weenect.
+Les informations sont récupérées à l'enregistremenet de la configuration du plugin, et tous les jours.
 
 <p align="center">
   <img src="/docs/imgs/equipement.png">
@@ -59,7 +59,7 @@ Les information sont récupérées à l'enregistremenet de la configuration du p
 ### Informations
 * __Latitude__ : la dernière latitude du tracker
 * __Longitude__ :la dernière longitude  du tracker
-* __Precision__ : la précision en mètre du signal GPS du tracker
+* __Precision__ : la précision en mètres du signal GPS du tracker
 * __Coordonnées__ : les coordonnées sous forme : [latitude],[longitude]
 
 * __Id Zone Courante__ : identifiant weenect de la zone en cours (0 si hors toutes zones)
@@ -92,8 +92,8 @@ onglets présentant les equipements zones attachés au tracker :
 <p align="center">
   <img src="/docs/imgs/zone_tab.png">
 </p>
-l'icone personne passe au vert quand la zone est occupée.
-si vous cliquez sur l'une des zones vous arrivez sur l'équipement de la zone : 
+l'icone "personne" passe au vert quand la zone est occupée.
+si vous cliquez sur l'une des zones vous arriverez sur l'équipement de la zone : 
 
 la configuration de zone contient l'identifiant du tracker attaché. 
 
