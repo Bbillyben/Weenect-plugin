@@ -244,6 +244,9 @@ function weenectUpdateMarker(eqId, coords, cmdId){
             if(map.circles[eqId]){
                 map.circles[eqId].setLatLng(coords.split(','));
             }
+            if(map.circles[eqId+"m"]){
+                map.circles[eqId+"m"].setLatLng(coords.split(','));
+            }
           if(map.histories && map.histories.feature && map.histories.hours){
           	  var date = new Date();
               var dateEnd = formatDate(date);
@@ -308,13 +311,14 @@ function weenectCreateMap(eqId, attribution, zoom){
     var map = {markers:{}, circles:{}, histories:{}};
     map.layer = new L.TileLayer('/plugins/weenect/core/ajax/weenect.proxy.php?url='+weenectObjects.theme.url, weenectObjects.theme);
     map.featureGroup = L.featureGroup();
+    map.zoneGroup = L.featureGroup();
     map.histories["line_groupe"] = L.featureGroup();
     map.histories["dot_groupe"] = L.featureGroup();
     map.histories["heat_groupe"] = L.featureGroup();
     map.map = L.map('map_' + eqId, {
         center: [51.5, -0.09],
         zoom: 15, 
-        layers:[map.layer, map.histories.line_groupe, map.histories.dot_groupe, map.featureGroup],
+        layers:[map.layer, map.histories.line_groupe, map.histories.dot_groupe, map.zoneGroup, map.featureGroup],
         attributionControl: attribution,
         zoomControl: zoom
     });
@@ -370,7 +374,7 @@ function weenectCreateZone(eqId, point, id){
           className: 'weenect-zone-avatar-'+id
     }),
           zIndexOffset:  1000
-     }).addTo(weenectObjects.maps[eqId].featureGroup);
+     }).addTo(weenectObjects.maps[eqId].zoneGroup);
     weenectObjects.maps[eqId].markers[id] = marker;
 }
 function weenectCreateHistory(eqId, point, id){
@@ -398,6 +402,12 @@ function weenectCreateHistory(eqId, point, id){
 }
 
 function weenectCreateCircle(eqId, point, id, fillAlpha=0.2){
+    console.log("weenectCreateCircle :"+eqId+" / "+id)
+    if(point.type =="weenect"){
+        var addMap = weenectObjects.maps[eqId].featureGroup;
+    }else{
+        var addMap = weenectObjects.maps[eqId].zoneGroup;
+    }
     if(point.radius && !isNaN(point.radius.value)){
         var circle = L.circle(point.coord.value.split(','), {
             radius: point.radius.value,
@@ -405,7 +415,7 @@ function weenectCreateCircle(eqId, point, id, fillAlpha=0.2){
             fillColor: point.color,
             fillOpacity: fillAlpha,
               weight: 1
-        }).addTo(weenectObjects.maps[eqId].featureGroup);
+        }).addTo(addMap);
         weenectObjects.maps[eqId].circles[id] = circle;
     }
 }
@@ -459,7 +469,7 @@ function weenectFocusFeatureGroup(eqId){
     if(!Object.keys(weenectObjects.maps[eqId].markers).length){
   	    return;
     }
-    weenectObjects.maps[eqId].map.fitBounds(weenectObjects.maps[eqId].featureGroup.getBounds(), {padding: [30, 30]});
+    weenectObjects.maps[eqId].map.fitBounds(weenectObjects.maps[eqId].featureGroup.getBounds(), {padding: [130, 130]});
     if(weenectObjects.maps[eqId].customZoom){
         weenectObjects.maps[eqId].map.setZoom(weenectObjects.maps[eqId].customZoom);
     }
