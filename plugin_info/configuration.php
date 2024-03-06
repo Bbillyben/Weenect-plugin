@@ -168,6 +168,7 @@ $themes = weenect::getMapLayers();
               <option value="24">1 {{jour}}</option>
               <option value="72">3 {{jour}}</option>
               <option value="84">1 {{semaine}}</option>
+              <option value="720">1 {{mois}}</option>
             </select>
           </div>
         </div>

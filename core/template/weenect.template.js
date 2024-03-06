@@ -148,6 +148,24 @@ function weenectUpdateBattery(id, _options){
     cmd.find('i').attr('class', 'fa ' + icon);
 }
 
+function weenectUpdateSattelites(id, _options){
+    var cmd = $('.cmd.weenect-satellites[data-cmd_id='+id+']');
+    cmd.empty().append(_options.display_value);
+
+    var icon = 'fa-satellite-dish';
+    if(_options.display_value > 8){
+        icon += ' text-success';
+    }else if(_options.display_value > 5){
+        icon += ' text-info';
+    }else if(_options.display_value > 2){
+        icon += ' text-warning';
+    }else{
+        icon += ' text-danger';
+    }
+    cmd = $('.cmd.weenect-satellites-icon[data-cmd_id='+id+']');
+    cmd.find('i').attr('class', 'fa ' + icon);
+}
+
 function weenectUpdateLastSeen(id, _options){
     var cmd = $('.cmd.weenect-horodatage[data-cmd_id='+id+']');
     cmd.html(formatDate(_options.display_value));
@@ -420,6 +438,12 @@ function weenectCreatePoint(eqId, point){
             weenectUpdateCircleRadius(id, _options.display_value);
         }
         jeedom.cmd.update[point.radius.id]({display_value:point.radius.value});
+    }
+    if(point.satellites){
+        jeedom.cmd.update[point.satellites.id] = function(_options) {
+            weenectUpdateSattelites(point.satellites.id, _options);
+        }
+        jeedom.cmd.update[point.satellites.id]({display_value:point.satellites.value});
     }
 
     if(point.coord){

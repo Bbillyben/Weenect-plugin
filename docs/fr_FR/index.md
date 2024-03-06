@@ -54,6 +54,8 @@ Les informations sont récupérées à l'enregistremenet de la configuration du 
 * Tracker id : l'identifiant du tracker 
 * Date Creation : date ou le tracker a été activé dans weenect
 * Date de Garantie : date de fin de garantie
+* IMEI : identifiant imei du tracker
+* Type : type du tracker 
 
 ## commandes disponibles : 
 ### Informations
@@ -70,13 +72,23 @@ Les informations sont récupérées à l'enregistremenet de la configuration du 
 
 * __Battery__ : le pourcentage de batterie du tracker
 * __GSM__ : la qualité du signal GSM
+* __satellites__ : le nombre de satellites captés par le tracker
 * __Signal__ : la qualité du signal GPS 
 * __Online__ : si le tracker est en ligne
 
 * __Date Expiration__ : date d'éxpiration de l'abonnement
 
-* __type__ : type du tracker
+* __type__ : type de notification envoyées : 
+   * ALM-OFF : quand le tracker a été mis hors tension
+   * ALM-H : le message sur le 1er bouton a été envoyé
+   * ALM-G : le message sur le 2nd bouton a été envoyé
+   * CMD-V3 : le message sur le bouton SOS a été envoyé
+   * CMD-T : mode normal (possition transmise?)
 
+* __Raison Hors Tension__: Raison de la mise hors tension 
+   * ALM-OFF : mise hors tension par le bouton
+   *  autre à trouver remonter sur le [community de jeedom](https://community.jeedom.com/).
+* __temps d'appel restant__ : le nombre de minutes d'appel restant
 * __Valid Signal__ : un paramètre signal valide renvoyé par le tracker? 
 * __Deepsleep__ : si le tracker est en veille prolongée
 
@@ -120,6 +132,7 @@ en haut à gauche de la tuile dashboard, vous avez les trois commande : demande 
 autour de la carte sont affichés : 
 * la date de mise à jour de la position
 * le nom de la zone occupée
+* le nombre de satellites
 * le pourcentage de batterie
 * la précision
 * les coordonnées

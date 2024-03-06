@@ -10,20 +10,34 @@
 			<span>#name_display# <span class="object_name">#object_name#</span></span><br/>
 		</span>
     </center>
+    <center>
+        <div class="col-sm-4 text-center">#current_zone#</div>
+    </center>
     <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">
-            <div class="col-sm-4"><span class="cmd" data-cmd_id="#tracker_id#">#last_seen#</span></div>
-            <div class="col-sm-4 text-center">#current_zone#</div>
-            <div class="col-sm-4 text-right">#tracker_battery#</div>
+           <div class="cmd col-sm-12 weenect-date" data-cmd_id="#tracker_id#">#last_seen#</div>
     </div>
+    
     <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;">
         <div class="col-sm-12">
             <div class="weenect" id="map_#tracker_id#"></div>
         </div>
     </div> 
+    <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">       
+        <div class="col-sm-6">#satellites#</div>
+        <div class="col-sm-6 text-right" style="text-align: right;">#tracker_battery#</div>
+    </div>
     <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">
-        <div class="col-sm-4"><span class="weenect-gen">{{Précision}} : <span class="weenect-accuracy">#accuracy#</span> m</span></div>
-        <div class="col-sm-6 text-right">#coordonate#</div>
+        <div class="col-sm-12"><span class="weenect-gen">{{Précision}} : <span class="weenect-accuracy">#accuracy#</span> m</span></div>
         
+    </div>
+    <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:block;">
+        <div class="row align-items-center">
+            <div class="col-lg-6"><button class="weenect-cmd vibrate cursor" data-cmd_id="#vibrate_id#"><i class="fas fa-cube" title="{{Faire vibrer le tracker}}"></i></button></div>
+            <div class="col-lg-6"><button class="cmd weenect-cmd ring cursor" data-cmd_id="#ring_id#"><i class="fas fa-bell" title="{{Faire sonner le tracker}}"></i></button></div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-lg-6"><button class="cmd weenect-cmd ring cursor" data-cmd_id="#ask_refresh#"><i class="fas fa-map-marked-alt" title="{{Demande de mise à jour de la position}}"></i></button></div>
+        </div>
     </div>
     <link rel="stylesheet" href="plugins/weenect/3rdparty/leaflet.css"/> 
     <link rel="stylesheet" href="plugins/weenect/3rdparty/weenect_tile.css"/>
@@ -40,7 +54,8 @@
         .weenect-#tracker_id# .weenect-horodatage,
         .weenect-#tracker_id# .weenect-battery,
         .weenect-#tracker_id# .weenect-coord,
-        .weenect-#tracker_id# .weenect-gen{
+        .weenect-#tracker_id# .weenect-gen,
+        .weenect-#tracker_id# .weenect-satellites{
             font-size:10px !important;
         }
         .weenect-#tracker_id# .weenect-battery-icon {
@@ -53,7 +68,11 @@
         #weenect-address-#tracker_id# .weenect-address{
             font-size:12px !important;
         }
-
+        .weenect-#tracker_id# .weenect-horodatage{
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+        }
         /* for weenect cmd */
         .weenect-cmd-cont .weenect-cmd:first-child{
             margin-left:0px !important;
@@ -70,6 +89,13 @@
             font-size: 12px;
             line-height: 12px;
         }
+         /* for weenect info */
+         .weenect-info .weenect-col{
+            margin-right: 10px;
+        }
+        .weenect-info .weenect-col:last-child{
+            margin-right: 0 !important;
+        }
     </style>
     
     <script src="plugins/weenect/3rdparty/leaflet.js"></script>
@@ -77,13 +103,17 @@
     <script src="plugins/weenect/core/template/weenect.template.js"></script>
     <script type="text/javascript">
     
-        if ('#refresh_id#' != ''){
-            $('.eqLogic[data-eqLogic_uid=#uid#] .refresh').on('click', function () {
-                jeedom.cmd.execute({id: '#refresh_id#'});
-            });
-        }else{
-            $('.eqLogic[data-eqLogic_uid=#uid#] .refresh').remove();
-        }
+        $('.eqLogic[data-eqLogic_uid=#uid#] .weenect-cmd').each(function(e){
+            if(!isNaN($(this).data("cmd_id"))){
+                $(this).on('click', function () {
+                    jeedom.cmd.execute({id: $(this).data("cmd_id"), notify: false});
+                    weenect_notify('#uid#', $(this).data("cmd_id"));
+                });
+            }else{
+                $(this).remove();
+            }
+
+        });
         var data#tracker_id#=JSON.parse('#json#');
         var trackerName='#name_display#';
 
