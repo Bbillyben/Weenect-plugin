@@ -81,6 +81,42 @@ function weenectLetterAvatar (name, size, color) {
 
     return dataURI;
 }
+function weenectZoneNameAvatar(name, size, color){
+
+    // Mesurer la largeur et la hauteur du texte
+    var textMeasureCanvas = document.createElement('canvas');
+    var textMeasureContext = textMeasureCanvas.getContext("2d");
+    textMeasureContext.font = "bold "+Math.round(size) + "px Arial";
+    var textWidth = textMeasureContext.measureText(name).width;
+    var textHeight = Math.round(size)
+    var padding = 5;
+
+
+    canvas        = document.createElement('canvas');
+    canvas.width  = textWidth;
+    canvas.height = textHeight;
+    context       = canvas.getContext("2d");
+    canvas.style.overflow = "visible";
+    
+    
+    context.fillStyle = color;
+    context.beginPath();
+    context.roundRect (canvas.width/4-padding, 0, canvas.width/2+2*padding, canvas.height, size/3);
+    context.fill();
+    // texte
+    context.font = "bold "+Math.round(size/2)+"px Arial";
+    context.textAlign = "center";
+    context.textBaseline  = "middle";
+    context.fillStyle = "white";
+    context.fillText(name, textWidth/2,textHeight/2);
+
+    dataURI = {'canvas': canvas.toDataURL(), 'height': textHeight, 'width':textWidth};
+    canvas  = null;
+
+    return dataURI;
+
+
+}
 function weenectZoneAvatar(name, size, color){
     name  = name || '';
     size  = size || 60;
@@ -94,6 +130,7 @@ function weenectZoneAvatar(name, size, color){
     canvas.width  = size;
     canvas.height = size;
     context       = canvas.getContext("2d");
+    canvas.style.overflow = "visible";
     
     // Créer un dégradé de gris pour le corps de l'épingle
     var gradientBody = context.createLinearGradient((size+thick)/2,0 , (size-thick)/2, 0);
@@ -123,7 +160,6 @@ function weenectZoneAvatar(name, size, color){
     // context.arc(size, size/2, size, 0, 2 * Math.PI);
     context.fillStyle = gradientHead;
     context.fill();
-    
 
     dataURI = canvas.toDataURL();
     canvas  = null;
@@ -306,11 +342,12 @@ function weenectSetTheme(light, dark){
     }    
 }
 
-function weenectCreateMap(eqId, attribution, zoom){
-    //console.log("weenectCreateMap :"+eqId)
-    var map = {markers:{}, circles:{}, histories:{}};
+function weenectCreateMap(eqId, attribution, zoom, eqOptions={}){
+    console.log("weenectCreateMap :"+JSON.stringify(eqOptions))
+    var map = {markers:{}, circles:{}, histories:{}, options:{}};
+    map.options=eqOptions;
     map.layer = new L.TileLayer('/plugins/weenect/core/ajax/weenect.proxy.php?url='+weenectObjects.theme.url, weenectObjects.theme);
-    map.featureGroup = L.featureGroup();
+    map.trackerGroup = L.featureGroup();
     map.zoneGroup = L.featureGroup();
     map.histories["line_groupe"] = L.featureGroup();
     map.histories["dot_groupe"] = L.featureGroup();
@@ -318,30 +355,66 @@ function weenectCreateMap(eqId, attribution, zoom){
     map.map = L.map('map_' + eqId, {
         center: [51.5, -0.09],
         zoom: 15, 
-        layers:[map.layer, map.histories.line_groupe, map.histories.dot_groupe, map.zoneGroup, map.featureGroup],
+        layers:[map.layer, map.zoneGroup,map.histories.line_groupe,map.histories.dot_groupe,  map.trackerGroup],
         attributionControl: attribution,
         zoomControl: zoom
     });
     weenectObjects.maps[eqId] = map;    
+
+    // // control
+    // var histMap = {
+    //     "line": L.featureGroup([map.histories["dot_groupe"],  map.histories["line_groupe"]]),
+    //     "HeatMap":map.histories["heat_groupe"],  
+    //     "None":L.featureGroup(),
+    // }
+    // var layerControl = L.control.layers(histMap).addTo(map.map);
+    // $('#map_'+eqId+' .leaflet-control-layers-base').on('change', function(e){
+    //     weenectUpdateHistory(eqId,  weenectObjects.maps[eqId].histories.point);
+    // });
 }
 
 function weenectCreateMarker(eqId, point){
     var id =point.id;
     //console.log("weenectCreateMarker :"+eqId+" / "+id)
     weenectObjects.colors[id] = point.color;
+    var map = weenectObjects.maps[eqId];
     if(point.type  && point.type == "weenect"){
         weenectCreateTracker(eqId, point, id);
-    }else if(point.pin && point.pin == 1){
+    }else if(map.options.pin && map.options.pin == 1){
         weenectCreateZone(eqId, point, id);      
     }
   	if(!point.coord.value){
     	return;
     }
     weenectCreateCircle(eqId, point, id);
-    weenectCreateCircle(eqId, {radius:{value:3},coord:point.coord, color:point.color}, id+"m", 1);   
+    circle = weenectCreateCircle(eqId, {radius:{value:3},coord:point.coord, color:point.color}, id+"m", 1);   
   	if(point.history){
     	weenectCreateHistory(eqId, point, id);
     }
+    if(point.type  && point.type == "weenect_zone" && map.options.zone_name== true){
+        createZoneName(eqId, point, id+"zn");
+    }
+}
+
+function createZoneName(eqId, point, id){
+    var icSize = 22;
+    var avatar = weenectZoneNameAvatar(point.name.value, icSize, point.color);
+    if(!point.coord.value){
+    	return;
+    }
+    var latlng = point.coord.value.split(',')
+    var marker = L.marker(latlng, {icon:  L.icon({
+        iconUrl: avatar.canvas,
+        iconSize: [avatar.width, avatar.height],
+        iconAnchor: [avatar.width/2, -avatar.height/2],
+        // tooltipAnchor: [0,10],
+        className: 'weenect-zone-name-'+id
+    }),
+          zIndexOffset:  1000
+     })
+    .addTo(weenectObjects.maps[eqId].zoneGroup);
+    weenectObjects.maps[eqId].markers[id] = marker;
+
 }
 function weenectCreateTracker(eqId, point, id){
     //console.log("weenectCreateTracker :"+eqId+" / "+id)
@@ -357,25 +430,28 @@ function weenectCreateTracker(eqId, point, id){
           className: 'weenect-avatar-'+id
     }),
           zIndexOffset:  1000
-     }).addTo(weenectObjects.maps[eqId].featureGroup);
+     }).addTo(weenectObjects.maps[eqId].trackerGroup);
     weenectObjects.maps[eqId].markers[id] = marker;
 }
 function weenectCreateZone(eqId, point, id){
-    //console.log("weenectCreateZone :"+eqId+" / "+id)
+    // console.log("weenectCreateZone :"+JSON.stringify(point))
     var avatar =  weenectZoneAvatar(point.name.value, 36, point.color);//'plugins/weenect/3rdparty/images/blank.png';//'plugins/weenect/3rdparty/images/blank.png';//weenectZoneAvatar(point.name.value, 36, point.color);//plugins/weenect/3rdparty/images/pin.png';
    if(!point.coord.value){
     	return;
     }
-    var marker = L.marker(point.coord.value.split(','), {icon:  L.icon({
+    var latlng = point.coord.value.split(',')
+    var marker = L.marker(latlng, {icon:  L.icon({
         iconUrl: avatar,
         iconSize: [36, 36],
         iconAnchor: [18, 36],
-        popupAnchor: [-3, -76],
-          className: 'weenect-zone-avatar-'+id
+        tooltipAnchor: [0,10],
+        className: 'weenect-zone-avatar-'+id
     }),
           zIndexOffset:  1000
-     }).addTo(weenectObjects.maps[eqId].zoneGroup);
+     })
+    .addTo(weenectObjects.maps[eqId].zoneGroup);
     weenectObjects.maps[eqId].markers[id] = marker;
+   
 }
 function weenectCreateHistory(eqId, point, id){
     //console.log("weenectCreateHistory :"+eqId+" / "+id)
@@ -402,22 +478,24 @@ function weenectCreateHistory(eqId, point, id){
 }
 
 function weenectCreateCircle(eqId, point, id, fillAlpha=0.2){
-    console.log("weenectCreateCircle :"+eqId+" / "+id)
+    // console.log("weenectCreateCircle :"+JSON.stringify(point))
     if(point.type =="weenect"){
-        var addMap = weenectObjects.maps[eqId].featureGroup;
+        var addMap = weenectObjects.maps[eqId].trackerGroup;
     }else{
         var addMap = weenectObjects.maps[eqId].zoneGroup;
     }
+    var color = weenectObjects.maps[eqId].options.dynamic_color == 1 && point.is_in && point.is_in.value ==1 ? 'green' : point.color;
     if(point.radius && !isNaN(point.radius.value)){
         var circle = L.circle(point.coord.value.split(','), {
             radius: point.radius.value,
-            color: point.color,
-            fillColor: point.color,
+            color: color,
+            fillColor: color,
             fillOpacity: fillAlpha,
               weight: 1
         }).addTo(addMap);
         weenectObjects.maps[eqId].circles[id] = circle;
     }
+    return circle;
 }
 
 function weenectCreatePoint(eqId, point){
@@ -469,7 +547,7 @@ function weenectFocusFeatureGroup(eqId){
     if(!Object.keys(weenectObjects.maps[eqId].markers).length){
   	    return;
     }
-    weenectObjects.maps[eqId].map.fitBounds(weenectObjects.maps[eqId].featureGroup.getBounds(), {padding: [130, 130]});
+    weenectObjects.maps[eqId].map.fitBounds(weenectObjects.maps[eqId].trackerGroup.getBounds(), {padding: [230, 230]});
     if(weenectObjects.maps[eqId].customZoom){
         weenectObjects.maps[eqId].map.setZoom(weenectObjects.maps[eqId].customZoom);
     }

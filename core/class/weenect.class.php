@@ -508,6 +508,7 @@ class weenect extends weenect_base {
     if (!is_array($replace)) {
         return $replace;
     }
+    
     log::add(__CLASS__, 'debug', '-----------------------  to html ------------------------------');
     $version = jeedom::versionAlias($_version);
     $replace['#version#'] = $_version;
@@ -545,9 +546,10 @@ class weenect extends weenect_base {
         $data['dark-theme'] = $mapsBG['OpenStreetMap.Mapnik'];
     }
 
-    // Data not implementer
     $data['control-zoom'] = ($version == 'dashboard');
     $data['control-attributions'] = ($version == 'dashboard');
+
+
     $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 70 : 250;
     $replace['#tracker_id#'] = $this->getLogicalId();
     // tracker info
@@ -590,23 +592,33 @@ class weenect extends weenect_base {
     $data['zones']=array();
     $zones = weenect_zone::byTracker($this->getLogicalId());
     $zoneColor = config::byKey('zone-color', __CLASS__)?:self::DEFAULT_ZONE_COLOR;
-    $showPin = ($version == 'dashboard') ? config::byKey('show-pin_dash', __CLASS__):config::byKey('show-pin_mob', __CLASS__);
     foreach($zones as $z){
       $zId = $z->getLogicalId();
       $data['zones'][$zId]=$z->buildLocation();
       $data['zones'][$zId]['color']=$zoneColor;
-      $data['zones'][$zId]['pin']=$showPin;
       $data['zones'][$zId]['name']=preg_replace('/'.$this->getName().'-/',"",$data['zones'][$zId]['name']);
       $cmd = $z->getCmd(null, "is_in");
       $data['zones'][$zId]['is_in']=static::buildCmd($cmd);
 
+    }
+    $showPin = ($version == 'dashboard') ? config::byKey('show-pin_dash', __CLASS__):config::byKey('show-pin_mob', __CLASS__);
+    $showZname = ($version == 'dashboard') ? config::byKey('show-zname_dash', __CLASS__):config::byKey('show-zname_mob', __CLASS__);
+    
+    //options 
+    $data['options']=array(
+      'pin' => $showPin,
+      'zone_name' => $showZname,
+      'dynamic_color' => config::byKey('dynamic_color', __CLASS__)
+    );
+
+    if($_version=='mobile'){
+      $replace['#class#'] ="allowResize col2";
     }
 
     $replace['#json#'] = str_replace("'", "\'", json_encode($data));
     // renvoi du template
     $tempFile = getTemplate('core', $version, 'weenect_tile', 'weenect');
     $html = $this->postToHtml($_version, template_replace($replace,$tempFile));
-    log::add(__CLASS__, "debug", "translate html : ". 'plugins/weenect/core/template/' . $version . '/weenect_tile.html');
     $html = translate::exec($html, 'plugins/weenect/core/template/' . $version . '/weenect_tile.html');
   
     return $html;

@@ -35,6 +35,7 @@ Le plugin récupère automatiquement les informations de vos trackers et zones a
 pour gérer les paramètres liés aux tuiles/carte 
 
 * Couleurs : permet de choisir les couleurs pour le tracker, et pour les zones
+* Couleur de Zone dynamique : permet de coloré en vert lorsqu'une zone est occupée.
 * Afficher l'épingle de zone : pour afficher ou non une 'épingle' sur les zones de sécurités, en plus du cercle de sécurité
 * Fond cartographique thème light/dark : vous permet de choisir les fonds de cartes pour les thèmes light et dark
 * Durée de l'historique : permet de selectionner la durée de l'historique affiché sur les tuiles. l'affichage de l'historique est géré dans les configurations de chaque équipement tracker.
@@ -80,14 +81,18 @@ Les informations sont récupérées à l'enregistremenet de la configuration du 
 
 * __type__ : type de notification envoyées : 
    * ALM-OFF : quand le tracker a été mis hors tension
+   * ALM-OFF-BAT : hors tension car batterie HS
    * ALM-H : le message sur le 1er bouton a été envoyé
    * ALM-G : le message sur le 2nd bouton a été envoyé
    * CMD-V3 : le message sur le bouton SOS a été envoyé
    * CMD-T : mode normal (possition transmise?)
+   * CMD-INV1S : le traceur s'est allumé (?)
 
 * __Raison Hors Tension__: Raison de la mise hors tension 
    * ALM-OFF : mise hors tension par le bouton
-   *  autre à trouver remonter sur le [community de jeedom](https://community.jeedom.com/).
+   * ALM-OFF-BAT : hors tension car batterie HS
+   * autre à trouver remonter sur le [community de jeedom](https://community.jeedom.com/).
+
 * __temps d'appel restant__ : le nombre de minutes d'appel restant
 * __Valid Signal__ : un paramètre signal valide renvoyé par le tracker? 
 * __Deepsleep__ : si le tracker est en veille prolongée

@@ -1,5 +1,10 @@
 # Changelog plugin Weenect Beta
 
+#
+* update leaflet.js to 1.8.0
+* add tooltip zone name display configuration 
+* add dynamic coloration of occupied zone
+
 # 2024-03-06
 * Add 1 month history depth in configuration
 * change API call for single tracker update -> give more info on tracker (eg. satelites)

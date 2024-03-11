@@ -118,7 +118,10 @@
       "Durée de l'historique":"Depth of history",
       "heure":"hour",
       "jour":"day",
-      "semaine":"week"
+      "semaine":"week",
+      "Afficher le nom de zone": "Show zone name",
+      "Couleur de zone dynamique": "Dynamic Zone Color"
+
    },
    "plugins\/weenect\/core\/template\/dashboard\/weenect_tile.html": {
       "Précision":"Accuracy",

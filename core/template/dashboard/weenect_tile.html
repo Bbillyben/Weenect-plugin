@@ -15,7 +15,7 @@
             <i class="fas fa-bell" title="{{Faire sonner le tracker}}"></i>
         </span>
         <span style="position:relative" class="cmd weenect-cmd vibrate pull-left cursor" data-cmd_id="#vibrate_id#">
-            <i class="fas fa-cube" title="{{Faire vibrer le tracker}}"></i>
+            <i class="icon divers-circular114  " title="{{Faire vibrer le tracker}}"></i>
         </span>
     </span>
 
@@ -54,10 +54,7 @@
             width: 100%;
             height: #height-map#px;
         }
-        #map_#tracker_id#.weenect .leaflet-marker-icon {
-            border-radius: 50% !important;
-        }
-        
+ 
         .weenect-#tracker_id# .weenect-precision,
         .weenect-#tracker_id# .weenect-horodatage,
         .weenect-#tracker_id# .weenect-battery,
@@ -100,6 +97,14 @@
         .weenect-info .weenect-col:last-child{
             margin-right: 0 !important;
         }
+        .weenect-zone-name{
+            font-size: 12px;
+            font-weight: bold;
+            padding: 1px !important;
+            /* background-color: transparent;
+            border: none;
+            box-shadow: none; */
+        }
     </style>
     <script src="plugins/weenect/3rdparty/leaflet.js"></script>
     <script src="plugins/weenect/3rdparty/heatlayer.js"></script>
@@ -139,7 +144,7 @@
             })
         }
         weenectSetTheme(data#tracker_id#['light-theme'], data#tracker_id#['dark-theme']);
-        weenectCreateMap( #tracker_id#, data#tracker_id#['control-attributions'], data#tracker_id#['control-zoom']);
+        weenectCreateMap( #tracker_id#, data#tracker_id#['control-attributions'], data#tracker_id#['control-zoom'], data#tracker_id#['options']);
         weenectObjects.maps[#tracker_id#].customZoom = parseInt('#zoom#');
 
         
