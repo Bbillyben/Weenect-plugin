@@ -1,9 +1,12 @@
 # Changelog plugin Weenect Beta
 
-#
+# 2024-03-15
 * update leaflet.js to 1.8.0
 * add tooltip zone name display configuration 
 * add dynamic coloration of occupied zone
+* add "Superlive" to launch superlive for tracker (fast refresh for 5 minutes)
+* add command info "update frequency" related to the frequecy of position updat eby the tracker
+* add command action "set update frequency" to set the frequecy of position update eby the tracker (list)
 
 # 2024-03-06
 * Add 1 month history depth in configuration

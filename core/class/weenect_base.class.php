@@ -45,6 +45,12 @@ class weenect_base extends eqLogic {
       }
       $wCMD->setType($setting['type']);
       $wCMD->setSubType($setting['subtype']);
+      if(is_array($setting['configuration'])){
+        foreach($setting['configuration'] as $confName => $confValue){
+          $wCMD->setConfiguration($confName, $confValue);
+        }
+      }
+
       $wCMD->setEqLogic_id($this->getId());
       $wCMD->save();
    }
