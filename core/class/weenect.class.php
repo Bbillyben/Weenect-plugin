@@ -534,126 +534,126 @@ class weenect extends weenect_base {
       );
   }
 
-  // public function toHtml($_version = 'dashboard') {
-  //   $replace = $this->preToHtml($_version, array(), true);
-  //   if (!is_array($replace)) {
-  //       return $replace;
-  //   }
+  public function toHtml($_version = 'dashboard') {
+    $replace = $this->preToHtml($_version, array(), true);
+    if (!is_array($replace)) {
+        return $replace;
+    }
     
-  //   log::add(__CLASS__, 'debug', '-----------------------  to html ------------------------------');
-  //   $version = jeedom::versionAlias($_version);
-  //   $replace['#version#'] = $_version;
-  //   $replace['#logicalId#'] = $this->getLogicalId();
-  //   $refresh = $this->getCmd(null, 'refresh');
-  //   if (is_object($refresh)) {
-  //       $replace['#refresh_id#'] = $refresh->getId();
-  //   }
-  //   $cmd= $this->getCmd(null, 'make_vibrate');
-  //   if (is_object($cmd)) {
-  //       $replace['#vibrate_id#'] = $cmd->getId();
-  //   }
-  //   $cmd= $this->getCmd(null, 'make_ring');
-  //   if (is_object($cmd)) {
-  //       $replace['#ring_id#'] = $cmd->getId();
-  //   }
-  //   $cmd= $this->getCmd(null, 'ask_refresh');
-  //   if (is_object($cmd)) {
-  //       $replace['#ask_refresh#'] = $cmd->getId();
-  //   }
+    log::add(__CLASS__, 'debug', '-----------------------  to html ------------------------------');
+    $version = jeedom::versionAlias($_version);
+    $replace['#version#'] = $_version;
+    $replace['#logicalId#'] = $this->getLogicalId();
+    $refresh = $this->getCmd(null, 'refresh');
+    if (is_object($refresh)) {
+        $replace['#refresh_id#'] = $refresh->getId();
+    }
+    $cmd= $this->getCmd(null, 'make_vibrate');
+    if (is_object($cmd)) {
+        $replace['#vibrate_id#'] = $cmd->getId();
+    }
+    $cmd= $this->getCmd(null, 'make_ring');
+    if (is_object($cmd)) {
+        $replace['#ring_id#'] = $cmd->getId();
+    }
+    $cmd= $this->getCmd(null, 'ask_refresh');
+    if (is_object($cmd)) {
+        $replace['#ask_refresh#'] = $cmd->getId();
+    }
     
 
 
-  //   $data = array();
-  //   // les fond de carte 
-  //   $mapsBG = self::getMapLayers();
-  //   if(array_key_exists(config::byKey('light-theme', 'weenect', 'OpenStreetMap.Mapnik'), $mapsBG)){
-  //       $data['light-theme'] = $mapsBG[config::byKey('light-theme', 'weenect', 'OpenStreetMap.Mapnik')];
-  //   }else{
-  //       $data['light-theme'] =$mapsBG['OpenStreetMap.Mapnik'];
-  //   }
-  //   if(array_key_exists(config::byKey('dark-theme', 'weenect', 'OpenStreetMap.Mapnik'), $mapsBG)){
-  //       $data['dark-theme'] = $mapsBG[config::byKey('dark-theme', 'weenect', 'OpenStreetMap.Mapnik')];
-  //   }else{
-  //       $data['dark-theme'] = $mapsBG['OpenStreetMap.Mapnik'];
-  //   }
+    $data = array();
+    // les fond de carte 
+    $mapsBG = self::getMapLayers();
+    if(array_key_exists(config::byKey('light-theme', 'weenect', 'OpenStreetMap.Mapnik'), $mapsBG)){
+        $data['light-theme'] = $mapsBG[config::byKey('light-theme', 'weenect', 'OpenStreetMap.Mapnik')];
+    }else{
+        $data['light-theme'] =$mapsBG['OpenStreetMap.Mapnik'];
+    }
+    if(array_key_exists(config::byKey('dark-theme', 'weenect', 'OpenStreetMap.Mapnik'), $mapsBG)){
+        $data['dark-theme'] = $mapsBG[config::byKey('dark-theme', 'weenect', 'OpenStreetMap.Mapnik')];
+    }else{
+        $data['dark-theme'] = $mapsBG['OpenStreetMap.Mapnik'];
+    }
 
-  //   $data['control-zoom'] = ($version == 'dashboard');
-  //   $data['control-attributions'] = ($version == 'dashboard');
+    $data['control-zoom'] = ($version == 'dashboard');
+    $data['control-attributions'] = ($version == 'dashboard');
 
 
-  //   $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 70 : 250;
-  //   $replace['#tracker_id#'] = $this->getLogicalId();
-  //   // tracker info
-  //   $cmd =$this->getCmd(null, 'coord');
-  //   if(is_object($cmd))$replace['#coordonate#'] = "<span id='coord' class='cmd weenect-coord ' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span>";
-  //   $data['tracker']=$this->buildLocation();
-  //   $data['tracker']['color']=config::byKey('tracker-color', __CLASS__)?:self::DEFAULT_TRACKER_COLOR;
-  //   $data['tracker']['heatmap']=false;
+    $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 70 : 250;
+    $replace['#tracker_id#'] = $this->getLogicalId();
+    // tracker info
+    $cmd =$this->getCmd(null, 'coord');
+    if(is_object($cmd))$replace['#coordonate#'] = "<span id='coord' class='cmd weenect-coord ' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span>";
+    $data['tracker']=$this->buildLocation();
+    $data['tracker']['color']=config::byKey('tracker-color', __CLASS__)?:self::DEFAULT_TRACKER_COLOR;
+    $data['tracker']['heatmap']=false;
     
-  //   $cmd  =$this->getCmd(null, 'curr_zone_name');
-  //   $zName= is_object($cmd) ? $cmd->execCmd():0;
-  //   $zName = preg_replace('/'.$this->getName().'-/',"",$zName);
-  //   if(! $zName || $zName==0) $zName="-";
-  //   $replace['#current_zone#'] ="<span id='current_zone' class='cmd weenect-current' data-cmd_id='".( is_object($cmd) ?$cmd->getId():0)."'>". $zName."</span>";
-  //   $data['tracker']['current_zone']=static::buildCmd($cmd);
+    $cmd  =$this->getCmd(null, 'curr_zone_name');
+    $zName= is_object($cmd) ? $cmd->execCmd():0;
+    $zName = preg_replace('/'.$this->getName().'-/',"",$zName);
+    if(! $zName || $zName==0) $zName="-";
+    $replace['#current_zone#'] ="<span id='current_zone' class='cmd weenect-current' data-cmd_id='".( is_object($cmd) ?$cmd->getId():0)."'>". $zName."</span>";
+    $data['tracker']['current_zone']=static::buildCmd($cmd);
     
-  //   $cmd=$this->getCmd(null, 'date_tracker');
-  //   if(is_object($cmd))$replace['#last_seen#']  =  "<span id='date_tracker' class='cmd weenect-horodatage' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span>";
-  //   $data['tracker']['last_seen']=static::buildCmd($cmd);
+    $cmd=$this->getCmd(null, 'date_tracker');
+    if(is_object($cmd))$replace['#last_seen#']  =  "<span id='date_tracker' class='cmd weenect-horodatage' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span>";
+    $data['tracker']['last_seen']=static::buildCmd($cmd);
     
-  //   $cmd  =$this->getCmd(null, 'battery');
-  //   if(is_object($cmd)) $replace['#tracker_battery#']  =  "<span class='cmd weenect-battery-icon' data-cmd_id='".$cmd->getId()."'><i class='fas fa-battery-half'></i></span><span id='battery' class='cmd weenect-battery' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span><span class='cmd weenect-battery'>%</span>";
-  //   $data['tracker']['battery']=static::buildCmd($cmd);
+    $cmd  =$this->getCmd(null, 'battery');
+    if(is_object($cmd)) $replace['#tracker_battery#']  =  "<span class='cmd weenect-battery-icon' data-cmd_id='".$cmd->getId()."'><i class='fas fa-battery-half'></i></span><span id='battery' class='cmd weenect-battery' data-cmd_id='".$cmd->getId()."'>".$cmd->execCmd()."</span><span class='cmd weenect-battery'>%</span>";
+    $data['tracker']['battery']=static::buildCmd($cmd);
    
    
-  //   $cmd  =$this->getCmd(null, 'radius');
-  //   if(is_object($cmd))$replace['#accuracy#'] = "<span id='radius' class='cmd weenect-precision' data-cmd_id='".$cmd->getId()."'> Precision :".$cmd->execCmd()." m</span>";
-  //   $data['tracker']['radius']=static::buildCmd($cmd);
+    $cmd  =$this->getCmd(null, 'radius');
+    if(is_object($cmd))$replace['#accuracy#'] = "<span id='radius' class='cmd weenect-precision' data-cmd_id='".$cmd->getId()."'> Precision :".$cmd->execCmd()." m</span>";
+    $data['tracker']['radius']=static::buildCmd($cmd);
 
-  //   $cmd  =$this->getCmd(null, 'satellites');
-  //   if(is_object($cmd))$replace['#satellites#'] = "<span class='cmd weenect-satellites-icon' data-cmd_id='".$cmd->getId()."'><i class='fas fa-battery-half'></i></span> <span id='satellites' class='cmd weenect-satellites' data-cmd_id='".$cmd->getId()."'> ".$cmd->execCmd()."</span>";
-  //   $data['tracker']['satellites']=static::buildCmd($cmd);
+    $cmd  =$this->getCmd(null, 'satellites');
+    if(is_object($cmd))$replace['#satellites#'] = "<span class='cmd weenect-satellites-icon' data-cmd_id='".$cmd->getId()."'><i class='fas fa-battery-half'></i></span> <span id='satellites' class='cmd weenect-satellites' data-cmd_id='".$cmd->getId()."'> ".$cmd->execCmd()."</span>";
+    $data['tracker']['satellites']=static::buildCmd($cmd);
 
-  //   // history du tracker
-  //   if($this->getConfiguration("show_history")){
-  //     $data['tracker']['history']=config::byKey('history_duration', __CLASS__);
-  //   }
+    // history du tracker
+    if($this->getConfiguration("show_history")){
+      $data['tracker']['history']=config::byKey('history_duration', __CLASS__);
+    }
     
-  //   // for zone
-  //   $data['zones']=array();
-  //   $zones = weenect_zone::byTracker($this->getLogicalId());
-  //   $zoneColor = config::byKey('zone-color', __CLASS__)?:self::DEFAULT_ZONE_COLOR;
-  //   foreach($zones as $z){
-  //     $zId = $z->getLogicalId();
-  //     $data['zones'][$zId]=$z->buildLocation();
-  //     $data['zones'][$zId]['color']=$zoneColor;
-  //     $data['zones'][$zId]['name']=preg_replace('/'.$this->getName().'-/',"",$data['zones'][$zId]['name']);
-  //     $cmd = $z->getCmd(null, "is_in");
-  //     $data['zones'][$zId]['is_in']=static::buildCmd($cmd);
+    // for zone
+    $data['zones']=array();
+    $zones = weenect_zone::byTracker($this->getLogicalId());
+    $zoneColor = config::byKey('zone-color', __CLASS__)?:self::DEFAULT_ZONE_COLOR;
+    foreach($zones as $z){
+      $zId = $z->getLogicalId();
+      $data['zones'][$zId]=$z->buildLocation();
+      $data['zones'][$zId]['color']=$zoneColor;
+      $data['zones'][$zId]['name']=preg_replace('/'.$this->getName().'-/',"",$data['zones'][$zId]['name']);
+      $cmd = $z->getCmd(null, "is_in");
+      $data['zones'][$zId]['is_in']=static::buildCmd($cmd);
 
-  //   }
-  //   $showPin = ($version == 'dashboard') ? config::byKey('show-pin_dash', __CLASS__):config::byKey('show-pin_mob', __CLASS__);
-  //   $showZname = ($version == 'dashboard') ? config::byKey('show-zname_dash', __CLASS__):config::byKey('show-zname_mob', __CLASS__);
+    }
+    $showPin = ($version == 'dashboard') ? config::byKey('show-pin_dash', __CLASS__):config::byKey('show-pin_mob', __CLASS__);
+    $showZname = ($version == 'dashboard') ? config::byKey('show-zname_dash', __CLASS__):config::byKey('show-zname_mob', __CLASS__);
     
-  //   //options 
-  //   $data['options']=array(
-  //     'pin' => $showPin,
-  //     'zone_name' => $showZname,
-  //     'dynamic_color' => config::byKey('dynamic_color', __CLASS__)
-  //   );
+    //options 
+    $data['options']=array(
+      'pin' => $showPin,
+      'zone_name' => $showZname,
+      'dynamic_color' => config::byKey('dynamic_color', __CLASS__)
+    );
 
-  //   if($_version=='mobile'){
-  //     $replace['#class#'] ="allowResize col2";
-  //   }
+    if($_version=='mobile'){
+      $replace['#class#'] ="allowResize col2";
+    }
 
-  //   $replace['#json#'] = str_replace("'", "\'", json_encode($data));
-  //   // renvoi du template
-  //   $tempFile = getTemplate('core', $version, 'weenect_tile', 'weenect');
-  //   $html = $this->postToHtml($_version, template_replace($replace,$tempFile));
-  //   $html = translate::exec($html, 'plugins/weenect/core/template/' . $version . '/weenect_tile.html');
+    $replace['#json#'] = str_replace("'", "\'", json_encode($data));
+    // renvoi du template
+    $tempFile = getTemplate('core', $version, 'weenect_tile', 'weenect');
+    $html = $this->postToHtml($_version, template_replace($replace,$tempFile));
+    $html = translate::exec($html, 'plugins/weenect/core/template/' . $version . '/weenect_tile.html');
   
-  //   return $html;
-  // }
+    return $html;
+  }
 
   
 
