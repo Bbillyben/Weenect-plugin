@@ -11,10 +11,15 @@ class W_API {
     // URLS :
     PRIVATE CONST LOGIN_URL = 'https://apiv4.weenect.com/v4/user/login'; // login  data : {'username':'my_username', 'password':'my_password'}
     PRIVATE CONST TRACKER_POSITION_URL = 'https://apiv4.weenect.com/v4/mytracker-userspace/position'; // les position de tous les tracker
+    PRIVATE CONST TRACKER_POSITION_SINGLE_URL = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/position'; // les position de tous les tracker
     PRIVATE CONST TRACKER_DATA_URL = 'https://apiv4.weenect.com/v4/mytracker-userspace'; // les information sur les tracker (date, zones, ...)
     PRIVATE CONST TRAKCER_POS_REFRESH = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/position/refresh'; // demande du refresh de la position / POST
-    PRIVATE CONST TRAKCER_VIBRATE = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/vibrate'; // demande du vibrate / OPTION
+    PRIVATE CONST TRAKCER_VIBRATE = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/vibrate'; // demande du vibrate / POST
     PRIVATE CONST TRAKCER_RING = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/ring'; // demande du ring / POST
+    PRIVATE CONST TRAKCER_SUPERLIVE = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/st-mode';// demande Superlive / POST
+    PRIVATE CONST TRAKCER_SET_FREQ = 'https://apiv4.weenect.com/v4/mytracker/#tracker_id#/mode'; // changement du temps de rafraichissement / POST / {mode : XX} / X = 30S / 1M / 2M / 3M / 5M
+    //https://apiv4.weenect.com/v4/mytracker/#tracker_id#/activity/v2?metric_system=km&start=2024-03-05T15:35:52.211Z&end=2024-03-06T15:35:53.211Z
+    //
 
     /* --------- Récupération du Token par login du user
     * retourne : String Token
@@ -39,9 +44,15 @@ class W_API {
     * retourne : String Token
     * $token : token d'authentification
     */
-    public static function get_tracker_position($token){
-        log::add('weenect', 'debug', '║ ╟───  Request for trackers data');
-        $dataCmd=W_API::computeCMD(W_API::TRACKER_POSITION_URL, $token);
+    public static function get_tracker_position($token, $eqId=null){
+        log::add('weenect', 'debug', '║ ╟───  Request for trackers data :'.$eqId);
+        if($eqId){
+            $cmdURL = str_replace('#tracker_id#', $eqId,  W_API::TRACKER_POSITION_SINGLE_URL);
+        }else{
+            $cmdURL = W_API::TRACKER_POSITION_URL;
+        }
+        log::add('weenect', 'debug', '║ ╟───  position url :'.$cmdURL);
+        $dataCmd=W_API::computeCMD($cmdURL, $token);
         // W_API::printData($dataCmd);
         return $dataCmd;
     }
@@ -63,7 +74,7 @@ class W_API {
     * $eqId : l'id du tracker auquel envoyer la commande
     * $cmd : le type de la commande (cf switch/case)
     */
-    public static function launch_command($token, $eqId, $cmd){
+    public static function launch_command($token, $eqId, $cmd, $params = Null){
         log::add('weenect', 'debug', '║ ╟───  launch_command :'.$cmd.' for eqId :'.$eqId);
         switch($cmd){
             case 'ask_refresh':
@@ -74,7 +85,13 @@ class W_API {
                 break; 
             case 'make_ring':
                 $url=static::TRAKCER_RING;
-                break;   
+                break; 
+            case 'make_superlive':
+                $url=static::TRAKCER_SUPERLIVE;
+                break; 
+            case 'set_freq_mode':
+                $url=static::TRAKCER_SET_FREQ;
+                break; 
         }
         if(!$url){
             log::add('weenect', 'error', 'ERROR, tracker command not found :'.$cmd);
@@ -82,8 +99,10 @@ class W_API {
         }
         $cmdUrl = str_replace('#tracker_id#', $eqId, $url);
         log::add('weenect', 'debug', '║ ╟───  Commande URL :'.$cmdUrl);
-
-        $dataCmd=W_API::computeCMD($cmdUrl, $token, Null, "POST");
+        if($params){
+            $params = json_encode($params);
+        }
+        $dataCmd=W_API::computeCMD($cmdUrl, $token, $params, "POST");
         // W_API::printData($dataCmd);
         return $dataCmd;
     }
@@ -98,7 +117,7 @@ class W_API {
    public static function computeCMD($cmd,$token, $dataPost=Null, $method="GET"){
         $data = array();
         $data['status']=0;
-        $headers = W_API::getBaseHeader($token);
+        $headers = W_API::getBaseHeader($token, $dataPost);
         $headersA=[];
         // log::add('weenect', 'debug', '║ ║ ╟─── Commande :'.$cmd);
         // log::add('weenect', 'debug', '║ ║ ╟─── Headers requete :'.implode(" | ",$headers));
@@ -138,9 +157,9 @@ class W_API {
     * retourne un array avec status, header et result de la réponse
     * $token : le token
     */
-   public static function getBaseHeader($token){
+   public static function getBaseHeader($token, $post){
         $headers = array();
-        $headers[] ="Content-Type:application/json";
+        if($post)$headers[] ="Content-Type:application/json";
 
         if($token<>''){
         $headers[] ='Authorization: JWT '.$token;

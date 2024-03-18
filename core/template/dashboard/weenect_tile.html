@@ -15,7 +15,7 @@
             <i class="fas fa-bell" title="{{Faire sonner le tracker}}"></i>
         </span>
         <span style="position:relative" class="cmd weenect-cmd vibrate pull-left cursor" data-cmd_id="#vibrate_id#">
-            <i class="fas fa-cube" title="{{Faire vibrer le tracker}}"></i>
+            <i class="icon divers-circular114  " title="{{Faire vibrer le tracker}}"></i>
         </span>
     </span>
 
@@ -26,7 +26,7 @@
     <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;display:flex;">
             <div class="col-sm-4"><span class="" data-cmd_id="#tracker_id#">#last_seen#</span></div>
             <div class="col-sm-4 text-center">#current_zone#</div>
-            <div class="col-sm-4 text-right">#tracker_battery#</div>
+            <div class="col-sm-4 text-right weenect-info"><span class="weenect-col">#satellites#</span><span class="weenect-col">#tracker_battery#</span></div>
     </div>
     <div class="row weenect-#tracker_id#" style="margin-right:0px;margin-left:0px;">
         <div class="col-sm-12">
@@ -54,15 +54,13 @@
             width: 100%;
             height: #height-map#px;
         }
-        #map_#tracker_id#.weenect .leaflet-marker-icon {
-            border-radius: 50% !important;
-        }
-        
+ 
         .weenect-#tracker_id# .weenect-precision,
         .weenect-#tracker_id# .weenect-horodatage,
         .weenect-#tracker_id# .weenect-battery,
         .weenect-#tracker_id# .weenect-coord,
-        .weenect-#tracker_id# .weenect-gen{
+        .weenect-#tracker_id# .weenect-gen,
+        .weenect-#tracker_id# .weenect-satellites{
             font-size:10px !important;
         }
         .weenect-#tracker_id# .weenect-battery-icon {
@@ -91,6 +89,21 @@
             color: var(--link-color) !important;
             font-size: 12px;
             line-height: 12px;
+        }
+        /* for weenect info */
+        .weenect-info .weenect-col{
+            margin-right: 10px;
+        }
+        .weenect-info .weenect-col:last-child{
+            margin-right: 0 !important;
+        }
+        .weenect-zone-name{
+            font-size: 12px;
+            font-weight: bold;
+            padding: 1px !important;
+            /* background-color: transparent;
+            border: none;
+            box-shadow: none; */
         }
     </style>
     <script src="plugins/weenect/3rdparty/leaflet.js"></script>
@@ -131,7 +144,7 @@
             })
         }
         weenectSetTheme(data#tracker_id#['light-theme'], data#tracker_id#['dark-theme']);
-        weenectCreateMap( #tracker_id#, data#tracker_id#['control-attributions'], data#tracker_id#['control-zoom']);
+        weenectCreateMap( #tracker_id#, data#tracker_id#['control-attributions'], data#tracker_id#['control-zoom'], data#tracker_id#['options']);
         weenectObjects.maps[#tracker_id#].customZoom = parseInt('#zoom#');
 
         

@@ -39,6 +39,7 @@ class weenect extends weenect_base {
       'battery'=>array('name'=>'Battery','type'=>'info', 'subtype'=>'numeric'),
       'gsm'=>array('name'=>'GSM','type'=>'info', 'subtype'=>'numeric'),
       'signal_strength_percent'=>array('name'=>'Signal','type'=>'info', 'subtype'=>'numeric'),
+      'satellites'=>array('name'=>'Satellites','type'=>'info', 'subtype'=>'numeric'),
       
       // position
       'latitude'=>array('name'=>'Latitude','type'=>'info', 'subtype'=>'numeric'),
@@ -50,12 +51,25 @@ class weenect extends weenect_base {
       'is_online'=>array('name'=>'Online','type'=>'info', 'subtype'=>'binary'),
       'valid_signal'=>array('name'=>'Valid Signal','type'=>'info', 'subtype'=>'binary'),  
       'is_in_deep_sleep'=>array('name'=>'Deepsleep','type'=>'info', 'subtype'=>'binary'),
+      'off_reason'=>array('name'=>'Raison Hors Tension','type'=>'info', 'subtype'=>'string'),
+      'left_call'=>array('name'=>'Temps Appel Restant','type'=>'info', 'subtype'=>'numeric'),
+
+
+      // update freq
+      'last_freq_mode'=>array('name'=>'Frequence Mise à Jour', 'type'=>'info', 'subtype'=>'string'),
+      'set_freq_mode'=>array('name'=>'Set Frequence Mise à Jour', 'type'=>'action', 'subtype'=>'select',
+            'configuration'=> array(
+              'infoName'=>'#last_freq_mode#', 
+              'value'=> '#value#',
+              'listValue'=>'30S|30S;1M|1M;2M|2M;3M|3M;5M|5M;10M|10M')
+            ),
 
       //action 
       'refresh'=>array('name'=>'Refresh','type'=>'action', 'subtype'=>'other'),
       'ask_refresh'=>array('name'=>'Demande mise à jour','type'=>'action', 'subtype'=>'other'),
       'make_vibrate'=>array('name'=>'Vibration','type'=>'action', 'subtype'=>'other'),
       'make_ring'=>array('name'=>'Sonnerie','type'=>'action', 'subtype'=>'other'),
+      'make_superlive'=>array('name'=>'Superlive','type'=>'action', 'subtype'=>'other'),
 
 
       //date 
@@ -73,6 +87,10 @@ class weenect extends weenect_base {
     'tracker_id'=>array('name'=>'Tracker id', 'info'=>'Id du tracker', 'type'=>'string'),
     'creation_date'=>array('name'=>'Date Creation', 'type'=>'date'),
     'warranty_end'=>array('name'=>'Date de Garantie', 'type'=>'date', 'info'=>'Date de fin de garantie du tracker'),
+    'imei'=>array('name'=>'IMEI', 'type'=>'string'),
+    'sim'=>array('name'=>'SIM', 'type'=>'string'),
+    'type'=>array('name'=>'Type', 'type'=>'string'),
+    'firmware'=>array('name'=>'Firmware', 'type'=>'string'),
     'related_zones'=>array('name'=>'Zones', 'info'=>'Zones attaché au trackers', 'hidden'=>true),
     'former_name'=>array('name'=>'former name', 'info'=>'ancien nom equipement', 'hidden'=>true),
   );
@@ -128,13 +146,11 @@ class weenect extends weenect_base {
     $merged_args = array_merge(array($token), $args);
     log::add(__CLASS__, 'debug', '║ ╟─── merged_args :'.json_encode($merged_args));
     $datas = call_user_func_array(array('W_API', $api_cmd), $merged_args);
-    // $datas = W_API::$api_cmd($token);
     if(!W_API::test_status($datas['status'])){
       log::add(__CLASS__, 'debug', '║ ╟─── curl status error : '.$datas['status'].' => try update token');
       $token = weenect::update_token();
       if(!$token)return False;
       $datas = call_user_func_array(array('W_API', $api_cmd), $merged_args);
-      //  $datas = W_API::$api_cmd($token);
       if(!W_API::test_status($datas['status']))return False;
     }
     return $datas;
@@ -171,13 +187,10 @@ class weenect extends weenect_base {
   /*  -----  lancement de la mise à jour des positions de tous les tracker.
   */
   public static function update_position(){
-    $datas = weenect::get_api_data('get_tracker_position');
-    log::add('weenect', 'debug', "║ ╠════════════════ position data : ".json_encode( $datas));
-    if(!$datas)return false;
-    foreach($datas['result'] as $tracker){
-      weenect::update_tracker($tracker);
+    log::add('weenect', 'debug', "║ ╠════════════════ Update All position data ");
+    foreach(eqLogic::byType("weenect") as $tracker){
+      $tracker->update_tracker_position();
     }
-    return True;
   }
 
   /*  -----  lancement de la mise à jour des positions de toutes les information et position des tracker.
@@ -205,7 +218,7 @@ class weenect extends weenect_base {
       $eqLogic=weenect::create_new_tracker($tId);
     }    
     $eqLogic->updateCMDfromArray($datas);// for general informations
-    $eqLogic->updateCMDfromArray($datas['position'][0]);
+    $eqLogic->updateCMDfromArray($datas['position'][0]);// for position
     $eqLogic->update_coordinate(self::W_CMD_common['coord']);
     $eqLogic->updateCurrentZone();
     log::add('weenect', 'debug', "║ ╠════════════════ End update tracker ");
@@ -224,6 +237,14 @@ class weenect extends weenect_base {
       $eqLogic=weenect::create_new_tracker($tId);
     }
     $eqLogic->updateCONFfromArray($datas, weenect::W_CONF_common);
+    // update call time 
+    $total_time = $datas['call_max_threshold'];
+    $used_time = $datas['call_usage'];
+    $left_time = $total_time - $used_time;
+    $eqLogic->checkAndUpdateCmd('left_call', $left_time);
+
+
+    log::add(__CLASS__, 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Time LEFT calculation :'.$total_time." - ".$used_time." = ".$left_time);
     // zone update
 
     if(array_key_exists("zones", $datas)){
@@ -368,6 +389,17 @@ class weenect extends weenect_base {
   public function postSave() {
     //     les commandes générales
     $this->createCMDFromArray(weenect::W_CMD_common);
+    // lien slider set freq
+    $valCmd = $this->getCmd(null, 'last_freq_mode');
+    $slCmd = $this->getCmd(null, 'set_freq_mode');
+    if(is_object($slCmd)){
+      log::add(__CLASS__, 'debug', 'slide value before :'.$slCmd->getValue());
+      log::add(__CLASS__, 'debug', 'Set Slider :'.$slCmd->getHumanName()." => ".$valCmd->getId());
+      $slCmd->setValue($valCmd->getId());
+      // $slCmd->setConfiguration('infoId', $valCmd->getId());
+      $slCmd->save();
+      log::add(__CLASS__, 'debug', 'slide value :'.$slCmd->getValue());
+    }
     // mise à jour de la commande coord : String latitude,longitude
     $this->update_coordinate(self::W_CMD_common['coord']);
     // mise à jour de la position du tracker dans une zone
@@ -385,7 +417,16 @@ class weenect extends weenect_base {
     }
   }
 
-
+  public function update_tracker_position(){
+    log::add('weenect', 'debug', "║ ╠════════════════ Update Single Tracker position data : ".$this->getName());
+    $datas = weenect::get_api_data('get_tracker_position', $this->getLogicalId());
+    $tracker_data = array(
+      'tracker_id'=>$this->getLogicalId(), 
+      "position"=>$datas['result']
+    );
+    log::add('weenect', 'debug', "║ ╠════════════════ position data : ".print_r($tracker_data, true));
+    weenect::update_tracker($tracker_data);
+  }
   /**  ----- mise à jour de la zone occupé par le tracker
   * met à jour les commande 'curr_zone_id' (idLogic de la zone en cours) et 'curr_zone_name' (nom de la zone en cours)
   * met à 0 les deux commande si aucune zone n'est occupé
@@ -446,6 +487,14 @@ class weenect extends weenect_base {
       $return = weenect::get_api_data('launch_command', $eqId, $action_type);
     }
 
+    public function updateFhz($fhz){
+      log::add(__CLASS__, 'debug', "Ask for FHz Update :".$fhz);
+      $eqId = $this->getLogicalId();
+      $return = weenect::get_api_data('launch_command', $eqId, 'set_freq_mode', array('mode'=>$fhz));
+      weenect::update_all();
+
+    }
+
     /* --------------------------------------------------------------------------------------
      ------------------------------------  widget personnalisé ------------------------------
      -------------------------------------------------------------------------------------- */
@@ -490,6 +539,7 @@ class weenect extends weenect_base {
     if (!is_array($replace)) {
         return $replace;
     }
+    
     log::add(__CLASS__, 'debug', '-----------------------  to html ------------------------------');
     $version = jeedom::versionAlias($_version);
     $replace['#version#'] = $_version;
@@ -527,9 +577,10 @@ class weenect extends weenect_base {
         $data['dark-theme'] = $mapsBG['OpenStreetMap.Mapnik'];
     }
 
-    // Data not implementer
     $data['control-zoom'] = ($version == 'dashboard');
     $data['control-attributions'] = ($version == 'dashboard');
+
+
     $replace['#height-map#'] = ($version == 'dashboard') ? intval($replace['#height#']) - 70 : 250;
     $replace['#tracker_id#'] = $this->getLogicalId();
     // tracker info
@@ -558,6 +609,11 @@ class weenect extends weenect_base {
     $cmd  =$this->getCmd(null, 'radius');
     if(is_object($cmd))$replace['#accuracy#'] = "<span id='radius' class='cmd weenect-precision' data-cmd_id='".$cmd->getId()."'> Precision :".$cmd->execCmd()." m</span>";
     $data['tracker']['radius']=static::buildCmd($cmd);
+
+    $cmd  =$this->getCmd(null, 'satellites');
+    if(is_object($cmd))$replace['#satellites#'] = "<span class='cmd weenect-satellites-icon' data-cmd_id='".$cmd->getId()."'><i class='fas fa-battery-half'></i></span> <span id='satellites' class='cmd weenect-satellites' data-cmd_id='".$cmd->getId()."'> ".$cmd->execCmd()."</span>";
+    $data['tracker']['satellites']=static::buildCmd($cmd);
+
     // history du tracker
     if($this->getConfiguration("show_history")){
       $data['tracker']['history']=config::byKey('history_duration', __CLASS__);
@@ -567,23 +623,33 @@ class weenect extends weenect_base {
     $data['zones']=array();
     $zones = weenect_zone::byTracker($this->getLogicalId());
     $zoneColor = config::byKey('zone-color', __CLASS__)?:self::DEFAULT_ZONE_COLOR;
-    $showPin = ($version == 'dashboard') ? config::byKey('show-pin_dash', __CLASS__):config::byKey('show-pin_mob', __CLASS__);
     foreach($zones as $z){
       $zId = $z->getLogicalId();
       $data['zones'][$zId]=$z->buildLocation();
       $data['zones'][$zId]['color']=$zoneColor;
-      $data['zones'][$zId]['pin']=$showPin;
       $data['zones'][$zId]['name']=preg_replace('/'.$this->getName().'-/',"",$data['zones'][$zId]['name']);
       $cmd = $z->getCmd(null, "is_in");
       $data['zones'][$zId]['is_in']=static::buildCmd($cmd);
 
+    }
+    $showPin = ($version == 'dashboard') ? config::byKey('show-pin_dash', __CLASS__):config::byKey('show-pin_mob', __CLASS__);
+    $showZname = ($version == 'dashboard') ? config::byKey('show-zname_dash', __CLASS__):config::byKey('show-zname_mob', __CLASS__);
+    
+    //options 
+    $data['options']=array(
+      'pin' => $showPin,
+      'zone_name' => $showZname,
+      'dynamic_color' => config::byKey('dynamic_color', __CLASS__)
+    );
+
+    if($_version=='mobile'){
+      $replace['#class#'] ="allowResize col2";
     }
 
     $replace['#json#'] = str_replace("'", "\'", json_encode($data));
     // renvoi du template
     $tempFile = getTemplate('core', $version, 'weenect_tile', 'weenect');
     $html = $this->postToHtml($_version, template_replace($replace,$tempFile));
-    log::add(__CLASS__, "debug", "translate html : ". 'plugins/weenect/core/template/' . $version . '/weenect_tile.html');
     $html = translate::exec($html, 'plugins/weenect/core/template/' . $version . '/weenect_tile.html');
   
     return $html;
@@ -617,13 +683,17 @@ class weenectCmd extends cmd {
       case 'update':
       case 'refresh':
         // demande la mise à jour de toutes les position des trackers.
-        weenect::update_position();
+        // weenect::update_position();
+        $this->getEqLogic()->update_tracker_position();
         break;
       case 'ask_refresh':
       case 'make_vibrate':
       case 'make_ring':
         $this->getEqLogic()->send_action($this->getLogicalId());
         break;
+      case 'set_freq_mode':
+          $fzCmd = $this->getEqLogic()->updateFhz($_options['select']);
+          break;
       default:
         log::add('weenect','debug', '╠════ Default call');
 

@@ -35,7 +35,9 @@ The plugin automatically retrieves information from your trackers and affiliated
 to manage tile/map settings 
 
 * Colors: allows you to choose the colours for the tracker and for the zones.
+* Dynamic Zone Color: colors a zone green when it is occupied.
 * Show zone pin: whether or not to show a 'pin' on safety zones, in addition to the safety circle
+* Show zone name: to display or not the name of safety zones
 * Map background light/dark theme: lets you choose the map backgrounds for the light and dark themes
 * History duration: allows you to select the duration of the history displayed on the tiles. The display of the history is managed in the configuration of each tracker device.
 
@@ -55,6 +57,8 @@ The information is retrieved when the plugin configuration is saved, and every d
 * Tracker id: the tracker identifier 
 * Creation date: date the tracker was activated in weenect
 * Warranty date: date the warranty expires
+* IMEI : imei identifiant of the tracker
+* Type : type of the tracker
 
 ## Command available : 
 ### Information
@@ -72,13 +76,25 @@ The information is retrieved when the plugin configuration is saved, and every d
 
 * __Battery__: the tracker's battery percentage
 * __GSM__ : GSM signal quality
+* __satellites__ : satellites number seen by the tracker
 * __Signal__: GPS signal quality 
 * __Online__: whether the tracker is online
 
 * __Date Expiration__ : subscription expiry date
 
-* __type__ : type of tracker
-
+* __type__ : type of notification sent : 
+   * ALM-OFF: when the tracker has been switched off
+   * ALM-OFF-BAT : power off beacause of out powered battery
+   * ALM-H: the message on the 1st button has been sent
+   * ALM-G: the message on the 2nd button has been sent
+   * CMD-V3: the message on the SOS button has been sent
+   * CMD-T: normal mode (position transmitted?)
+   * CMD-INV1S : tracker nback online (?)
+* __Reason Off__: Reason for power-down 
+   * ALM-OFF: Power off by the button
+   * ALM-OFF-BAT : power off beacause of out powered battery
+   * other to be found on the [jeedom community](https://community.jeedom.com/).
+* __left call__ : time left in minutes for call
 * __Valid Signal__ : a valid signal parameter returned by the tracker? 
 * __Deepsleep__ : if the tracker is in extended sleep mode
 
@@ -124,6 +140,7 @@ at the top left of the dashboard tile, you have the three commands: update reque
 around the map are displayed : 
 * the date the position was updated
 * the name of the zone occupied
+* the number of satellites
 * the battery percentage
 * accuracy
 * coordinates

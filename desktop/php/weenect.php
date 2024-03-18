@@ -75,9 +75,9 @@ $confList = weenect::W_CONF_common;
 		<!-- Onglets -->
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
-			<li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
+			<li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-map-marked-alt"></i> {{Tracker}}</a></li>
 			<li role="presentation"><a href="#commandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i> {{Commandes}}</a></li>
-			<li role="presentation"><a href="#zonetab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-map-marked-alt"></i> {{Zones}}</a></li>
+			<li role="presentation"><a href="#zonetab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-map-pin"></i> {{Zones}}</a></li>
 		</ul>
 		<div class="tab-content">
 			<!-- Onglet de configuration de l'équipement -->
@@ -139,6 +139,12 @@ $confList = weenect::W_CONF_common;
 								</div>
 							</div>
 
+							
+						</div>
+
+						<!-- Partie droite de l'onglet "Équipement" -->
+						<!-- Affiche un champ de commentaire par défaut mais vous pouvez y mettre ce que vous voulez -->
+						<div class="col-lg-6">
 							<legend><i class="fas fa-info"></i> {{Information Tracker}}</legend>
 							<?php
 							foreach ($confList as $key=>$param){
@@ -164,12 +170,6 @@ $confList = weenect::W_CONF_common;
 
 							}
 							?>
-						</div>
-
-						<!-- Partie droite de l'onglet "Équipement" -->
-						<!-- Affiche un champ de commentaire par défaut mais vous pouvez y mettre ce que vous voulez -->
-						<div class="col-lg-6">
-							<legend><i class="fas fa-info"></i> {{Informations}}</legend>
 							<div class="form-group">
 								<label class="col-sm-4 control-label">{{Description}}</label>
 								<div class="col-sm-6">

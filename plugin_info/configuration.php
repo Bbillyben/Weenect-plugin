@@ -124,10 +124,25 @@ $themes = weenect::getMapLayers();
             </div>
         </div>  
         <div class="form-group">
+            <label class="col-lg-4 control-label">{{Couleur de zone dynamique}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{passe la couleur en vert si la zone est occupée}}"></i></sup>
+            </label>
+            <div class="col-lg-4">
+                <input type="checkbox" class="configKey form-control" data-l1key="dynamic_color" checked/>
+            </div>
+        </div>
+        <div class="form-group">
             <label class="col-lg-4 control-label">{{Afficher l'épingle de zone}}</label>
             <div class="col-lg-4">
                 <label class="checkbox-inline"><input type="checkbox" class="configKey form-control" data-l1key="show-pin_dash" checked>{{Dashboard}}</label>
                 <label class="checkbox-inline"><input type="checkbox" class="configKey form-control" data-l1key="show-pin_mob">{{Mobile}}</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Afficher le nom de zone}}</label>
+            <div class="col-lg-4">
+                <label class="checkbox-inline"><input type="checkbox" class="configKey form-control" data-l1key="show-zname_dash" checked>{{Dashboard}}</label>
+                <label class="checkbox-inline"><input type="checkbox" class="configKey form-control" data-l1key="show-zname_mob">{{Mobile}}</label>
             </div>
         </div>
 
@@ -168,6 +183,7 @@ $themes = weenect::getMapLayers();
               <option value="24">1 {{jour}}</option>
               <option value="72">3 {{jour}}</option>
               <option value="84">1 {{semaine}}</option>
+              <option value="720">1 {{mois}}</option>
             </select>
           </div>
         </div>

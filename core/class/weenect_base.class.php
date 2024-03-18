@@ -34,7 +34,6 @@ class weenect_base extends eqLogic {
     * contenant les données name, type et subtype
  */
  public function createCMDFromArray($arrayCMD){
-  log::add("weenect", "debug", ">>> weenect createCMDFromArray ".__FILE__);
   foreach($arrayCMD as $logId => $setting){
       $wCMD = $this->getCmd(null, $logId);
       if (!is_object($wCMD)) {
@@ -46,6 +45,12 @@ class weenect_base extends eqLogic {
       }
       $wCMD->setType($setting['type']);
       $wCMD->setSubType($setting['subtype']);
+      if(is_array($setting['configuration'])){
+        foreach($setting['configuration'] as $confName => $confValue){
+          $wCMD->setConfiguration($confName, $confValue);
+        }
+      }
+
       $wCMD->setEqLogic_id($this->getId());
       $wCMD->save();
    }
@@ -76,14 +81,11 @@ class weenect_base extends eqLogic {
     foreach($data as $logId => $val){
       // log::add(self::$__CUR_CLASS__, 'debug', "║ ╟─── commands :".$logId);
         $cmdlogId = self::getCmdLogId($logId, $logId);// array_search($logId, array_column(static::get_cmd_array(), 'key'));
-        
-        // log::add(self::$__CUR_CLASS__, 'debug', 'from array :'.json_encode(static::get_cmd_array()));
         $wCMD = $this->getCmd(null, $cmdlogId);
         $isOk=true;
         if (is_object($wCMD)) {
-          // log::add(self::$__CUR_CLASS__, 'debug', "║ ║ ╟─ update commande $logId to $val");
+          log::add(self::$__CUR_CLASS__, 'debug', "║ ║ ╟─ update commande $logId to $val");
           $isOk = $this->checkAndUpdateCmd($cmdlogId, $val) && $isOk;
-          //  $this->checkAndUpdateCmd($wCMD->getLogicalId(),$val) && $isOk;
         }
     }
     return $isOk;
