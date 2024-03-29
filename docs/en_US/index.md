@@ -97,6 +97,7 @@ The information is retrieved when the plugin configuration is saved, and every d
 * __left call__ : time left in minutes for call
 * __Valid Signal__ : a valid signal parameter returned by the tracker? 
 * __Deepsleep__ : if the tracker is in extended sleep mode
+* __update frequency__ : tracker update frequency (string: 30S, 1M, 2M, 3M, 5M, 10M)
 
 ### commands
 
@@ -104,6 +105,7 @@ The information is retrieved when the plugin configuration is saved, and every d
 * __Request update__ : sends the position update request command to the tracker
 * __Vibration__ : sends the vibration request to the tracker
 * __Ringing__ : sends the ringing request to the tracker
+* __Set Frequency Update__: A list command to update the tracker refresh frequency (30 sec, 1 min, 2 min, 3 min, 5 min, 10 min).
 
 ## Areas 
 tabs showing the areas equipment attached to the tracker :
