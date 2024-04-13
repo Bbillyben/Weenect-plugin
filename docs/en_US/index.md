@@ -52,6 +52,7 @@ The information is retrieved when the plugin configuration is saved, and every d
 
 ## configuration 
 * Show history: shows or hides the history on the tile
+* Default zoom: sets the zoom level when the tile is displayed.
 
 ## information : 
 * Tracker id: the tracker identifier 
