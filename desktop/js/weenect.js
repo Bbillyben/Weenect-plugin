@@ -131,3 +131,10 @@ function bind_weenect_back(){
     jeedomUtils.loadPage(urlNav);
   });
 }
+
+/**-----  Suivi de la valeur du slider pour le zoom par défaut
+ * 
+*/
+$(".eqLogicAttr[data-l2key='default_zoom']").on('change input', function (e) {
+  $("#default_zoom_value").text($(this).value());
+});

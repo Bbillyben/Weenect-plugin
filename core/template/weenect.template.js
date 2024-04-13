@@ -343,7 +343,7 @@ function weenectSetTheme(light, dark){
 }
 
 function weenectCreateMap(eqId, attribution, zoom, eqOptions={}){
-    console.log("weenectCreateMap :"+JSON.stringify(eqOptions))
+    // console.log("weenectCreateMap :"+JSON.stringify(eqOptions))
     var map = {markers:{}, circles:{}, histories:{}, options:{}};
     map.options=eqOptions;
     map.layer = new L.TileLayer('/plugins/weenect/core/ajax/weenect.proxy.php?url='+weenectObjects.theme.url, weenectObjects.theme);
@@ -548,8 +548,8 @@ function weenectFocusFeatureGroup(eqId){
   	    return;
     }
     weenectObjects.maps[eqId].map.fitBounds(weenectObjects.maps[eqId].trackerGroup.getBounds(), {padding: [230, 230]});
-    if(weenectObjects.maps[eqId].customZoom){
-        weenectObjects.maps[eqId].map.setZoom(weenectObjects.maps[eqId].customZoom);
+    if(weenectObjects.maps[eqId].options.default_zoom){
+        weenectObjects.maps[eqId].map.setZoom(weenectObjects.maps[eqId].options.default_zoom);
     }
 }
 

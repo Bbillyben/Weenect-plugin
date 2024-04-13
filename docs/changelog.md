@@ -1,5 +1,8 @@
 # Changelog plugin Weenect
 
+# 2024-04-13
+* Add default zoom configuration in tracker equipment
+
 # 2024-03-15
 * update leaflet.js to 1.8.0
 * add tooltip zone name display configuration 
