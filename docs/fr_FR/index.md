@@ -50,7 +50,7 @@ Les informations sont récupérées à l'enregistremenet de la configuration du 
 
 ## configuration 
 * Afficher l'historique : permet d'afficher ou masquer l'historique sur la tuile
-
+* Zoom par défaut : défini le niveau de zoom lors de l'affichage de la tuile
 ## informations : 
 * Tracker id : l'identifiant du tracker 
 * Date Creation : date ou le tracker a été activé dans weenect
@@ -96,6 +96,7 @@ Les informations sont récupérées à l'enregistremenet de la configuration du 
 * __temps d'appel restant__ : le nombre de minutes d'appel restant
 * __Valid Signal__ : un paramètre signal valide renvoyé par le tracker? 
 * __Deepsleep__ : si le tracker est en veille prolongée
+* __Frequence Mise à Jour__ : la fréquence de mise à jour du tracker (texte : 30S, 1M, 2M, 3M, 5M, 10M)
 
 ### commandes
 
@@ -103,6 +104,7 @@ Les informations sont récupérées à l'enregistremenet de la configuration du 
 * __Demande mise à jour__ : envoi la commande de demande de mise à jour des positions vers le tracker
 * __Vibration__ : envoi la demande de vibration vers le tracker
 * __Sonnerie__ : envoi la demande de sonnerie vers le tracker
+* __Set Frequence Mise à Jour__ : Une commande de type liste pour mettre à jour la fréquence de rafraichissement du tracker (30 sec, 1 min, 2 min, 3 min, 5 min, 10 min) 
 
 ## Zones 
 onglets présentant les equipements zones attachés au tracker : 
