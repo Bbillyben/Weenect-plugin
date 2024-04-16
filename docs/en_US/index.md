@@ -52,7 +52,10 @@ The information is retrieved when the plugin configuration is saved, and every d
 
 ## configuration 
 * Show history: shows or hides the history on the tile
-* Default zoom: sets the zoom level when the tile is displayed.
+* Default focus: default focus between 
+    * Tracker: centered on tracker position
+    * Tracker + zone: centers map on tracker and safety zones
+* Default zoom: sets the zoom level when the tile is displayed, on tracker focus only.
 
 ## information : 
 * Tracker id: the tracker identifier 

@@ -635,12 +635,14 @@ class weenect extends weenect_base {
     $showPin = ($version == 'dashboard') ? config::byKey('show-pin_dash', __CLASS__):config::byKey('show-pin_mob', __CLASS__);
     $showZname = ($version == 'dashboard') ? config::byKey('show-zname_dash', __CLASS__):config::byKey('show-zname_mob', __CLASS__);
     $defaultZoom = $this->getConfiguration('default_zoom', 50);
+    $defaultFocus = $this->getConfiguration('default_focus', 'tracker');
     //options 
     $data['options']=array(
       'pin' => $showPin,
       'zone_name' => $showZname,
       'dynamic_color' => config::byKey('dynamic_color', __CLASS__),
-      'default_zoom' => $defaultZoom
+      'default_zoom' => $defaultZoom, 
+      'default_focus' => $defaultFocus, 
     );
 
     if($_version=='mobile'){

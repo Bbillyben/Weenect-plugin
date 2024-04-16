@@ -50,7 +50,10 @@ Les informations sont récupérées à l'enregistremenet de la configuration du 
 
 ## configuration 
 * Afficher l'historique : permet d'afficher ou masquer l'historique sur la tuile
-* Zoom par défaut : défini le niveau de zoom lors de l'affichage de la tuile
+* Focus par défaut : Focus par défaut entre 
+    * Tracker : centré sur la postion du tracker
+    * Tracker + zone : centre la carte sur le tracker et les zones de sécurités
+* Zoom par défaut : défini le niveau de zoom lors de l'affichage de la tuile, uniquement sur focus tracker.
 ## informations : 
 * Tracker id : l'identifiant du tracker 
 * Date Creation : date ou le tracker a été activé dans weenect

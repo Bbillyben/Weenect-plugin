@@ -132,6 +132,18 @@ function bind_weenect_back(){
   });
 }
 
+/**-----  Suivi de la configuration du focus par défaut
+ * 
+*/
+$(".eqLogicAttr[data-l2key='default_focus']").on('change input', function (e) {
+    console.log($(this).value());
+    if($(this).value() == 'tracker'){
+      $(".form-group.zoom-group").show("slide", {direction: "up" },500);
+    }else{
+      $(".form-group.zoom-group").hide("slide", {direction: "up" },500);
+    }
+});
+
 /**-----  Suivi de la valeur du slider pour le zoom par défaut
  * 
 */

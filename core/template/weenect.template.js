@@ -547,10 +547,14 @@ function weenectFocusFeatureGroup(eqId){
     if(!Object.keys(weenectObjects.maps[eqId].markers).length){
   	    return;
     }
-    weenectObjects.maps[eqId].map.fitBounds(weenectObjects.maps[eqId].trackerGroup.getBounds(), {padding: [230, 230]});
-    if(weenectObjects.maps[eqId].options.default_zoom){
-        weenectObjects.maps[eqId].map.setZoom(weenectObjects.maps[eqId].options.default_zoom);
-    }
+    if(weenectObjects.maps[eqId].options.default_focus == 'tracker'){
+        weenectObjects.maps[eqId].map.setView(weenectObjects.maps[eqId].markers[eqId].getLatLng())
+        if(weenectObjects.maps[eqId].options.default_zoom){
+            weenectObjects.maps[eqId].map.setZoom(weenectObjects.maps[eqId].options.default_zoom);
+        }
+    }else if(weenectObjects.maps[eqId].options.default_focus == 'tracker_zone'){
+        weenectObjects.maps[eqId].map.fitBounds(weenectObjects.maps[eqId].trackerGroup.getBounds().extend(weenectObjects.maps[eqId].zoneGroup.getBounds()));
+    }  
 }
 
 function weenectMapLoaded(eqId){
