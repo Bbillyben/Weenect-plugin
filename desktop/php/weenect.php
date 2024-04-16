@@ -139,11 +139,21 @@ $confList = weenect::W_CONF_common;
 								</div>
 							</div>
 							<div class="form-group">
+								<label class="col-sm-4 control-label">{{Focus par défaut}}
+								</label>
+								<div class="col-sm-4">
+								<select id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="default_focus">
+									<option value="tracker">{{Tracker}}</option>
+									<option value="tracker_zone">{{Tracker et Zones}}</option>
+								</select>
+								</div>
+							</div>
+							<div class="form-group zoom-group">
 								<label class="col-sm-4 control-label">{{Zoom par défaut}}
 								<sup><i class="fas fa-question-circle tooltips" title="{{zoom par défaut lors de l'affichage de la tuile}}"></i></sup>
 								</label>
 								<div class="col-sm-4">
-									<input type="range" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="default_zoom" min="10" max="20" step="1">
+									<input type="range" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="default_zoom" min="10" max="20" step="1" style="-webkit-appearance:auto;">
 									
 								</div>
 								<div class="col-sm-2">

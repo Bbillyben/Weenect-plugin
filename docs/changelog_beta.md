@@ -1,5 +1,9 @@
 # Changelog plugin Weenect Beta
 
+# 2024-04-16
+* add default focus : let user choose between default focus on tracker, with default zoom, or tracker + security zones 
+* update default zoom slider format
+
 # 2024-04-13
 * Add default zoom configuration in tracker equipment
 
