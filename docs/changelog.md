@@ -1,5 +1,10 @@
 # Changelog plugin Weenect
 
+# 2026-01-04
+* Fix : Issue loading in design (Update Javascript loading (thanks noodom) to fit 4.4 loading)
+* Add Battery status update in Analyse->Equipement->battery
+
+
 # 2024-04-16
 * add default focus : let user choose between default focus on tracker, with default zoom, or tracker + security zones 
 * update default zoom slider format
