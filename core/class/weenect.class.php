@@ -321,7 +321,7 @@ class weenect extends weenect_base {
       
       }
     }
-    if($name==undefined || !$name){
+    if($name == null || $name == ''){
       $name = "Tracker ".uniqid();
     }
     log::add(__CLASS__, 'debug', "║ ╟─── tracker name : $name");
