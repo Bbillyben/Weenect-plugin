@@ -118,6 +118,43 @@ class weenect extends weenect_base {
       $d = 2 * atan2(sqrt($a), sqrt(1 - $a));
       return round(($earth_radius * $d)*1000, 2);
   }
+  
+  /* ------------------------------------------------------------------------
+  ------------------------------   Post Community  --------------------------
+  --------------------------------------------------------------------------- */
+  public static function getConfigForCommunity($separator = '<br/>') {
+		$infos = "";
+    $token = config::byKey('token', 'weenect', null);
+    $infos .= $separator . ' > token actif :'.((strlen($token)<2 or is_null($token))?'false':'true');
+    // fréquence cron choisie
+    $cron=config::byKey('freq', 'weenect', 'none');
+    $infos .= $separator . ' > Cron :'.$cron;
+    if($cron=="prog") $infos .= $separator . ' > Custom Cron :'.config::byKey('autorefresh', 'weenect', 'none');
+    // verif if cron activé
+    $cronSched = cron::byClassAndFunction(__CLASS__, 'update_position');
+    $infos .= $separator . ' > Cron actif :'.(is_object($cronSched)?'true':'false');
+    //cron daily
+    $cronDaily=config::byKey('functionality::cronDaily::enable', 'weenect', Null);
+    $infos .= $separator . ' > CronDaily actif :'.($cronDaily == 1?"true":'false');
+
+    // durée historique
+    $infos .= $separator . ' > historique :'.config::byKey('history_duration', 'weenect', 'none');
+
+    // log level
+    $loglevel=config::byKey('log::level::weenect');
+    $logLevelSel="none";
+    foreach ($loglevel as $ll=>$val) {
+      log::add(__CLASS__, 'debug', 'll :'.$ll. " / ".$val);
+      if($val=="1"){
+        $logLevelSel = $ll;
+        break;
+      }
+    }
+    $infos .= $separator . ' > log level :'.$logLevelSel;
+		return $infos;
+	}
+
+
   /* --------------------------------------------------------------------------------
   ------------------------------   Fonction de mise à jour --------------------------
   ---------------------------------------------------------------------------------- */
