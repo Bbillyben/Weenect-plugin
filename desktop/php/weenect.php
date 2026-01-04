@@ -18,15 +18,21 @@ $confList = weenect::W_CONF_common;
 <div class="row row-overflow">
 	<!-- Page d'accueil du plugin -->
 	<div class="col-xs-12 eqLogicThumbnailDisplay">
-		<legend><i class="fas fa-cog"></i> {{Gestion}}</legend>
-		<!-- Boutons de gestion du plugin -->
-		<div class="eqLogicThumbnailContainer">
-			<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
-				<i class="fas fa-wrench"></i>
-				<br>
-				<span>{{Configuration}}</span>
+	<div class="row">
+		<div class="col-sm-10">
+			<legend><i class="fas fa-cog"></i> {{Gestion}}</legend>
+			<!-- Boutons de gestion du plugin -->
+			<div class="eqLogicThumbnailContainer">
+				<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
+					<i class="fas fa-wrench"></i>
+					<br>
+					<span>{{Configuration}}</span>
+				</div>
 			</div>
 		</div>
+	</div>
+		
+		
 		<legend><i class="fas fa-mobile"></i> {{Mes Trackers}}</legend>
 		<?php
 		if (count($eqLogics) == 0) {
