@@ -257,4 +257,5 @@ include_file('desktop', $weenectJS, 'js', 'weenect');
 include_file('desktop', 'weenect', 'js', 'weenect');
 ?>
 <!-- Inclusion du fichier javascript du core - NE PAS MODIFIER NI SUPPRIMER -->
+<?php include_file('desktop', 'plugin', 'js'); ?>
 <?php include_file('core', 'plugin.template', 'js'); ?>
