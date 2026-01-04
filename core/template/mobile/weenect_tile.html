@@ -98,11 +98,56 @@
         }
     </style>
     
-    <script src="plugins/weenect/3rdparty/leaflet.js"></script>
-    <script src="plugins/weenect/3rdparty/heatlayer.js"></script>
-    <script src="plugins/weenect/core/template/weenect.template.js"></script>
     <script type="text/javascript">
     
+        var data#tracker_id#=JSON.parse('#json#');
+        var trackerName='#name_display#';
+
+        function includeJS_seq(filenames, callback) {
+            if (typeof filenames === 'string') {
+                filenames = [filenames];
+            }
+
+            let loadedCount = 0;
+
+            function loadNext() {
+                if (loadedCount >= filenames.length) {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }else{
+                        throw(Error("Call back is not a function"));
+                    }
+                    return;
+                }
+
+                let filename = filenames[loadedCount];
+                let sc = document.createElement('script');
+                sc.src = filename;
+                sc.type = 'text/javascript';
+                sc.async = false; 
+
+                sc.onerror = function () {
+                    console.log("Error loading :", filename);
+                    loadedCount++;
+                    sc.onerror = sc.onload = sc.onreadystatechange = null;
+                    loadNext();
+                };
+
+                sc.onload = sc.onreadystatechange = function () {
+                    if (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') {
+                        loadedCount++;
+                        sc.onerror = sc.onload = sc.onreadystatechange = null;
+                        loadNext(); // on enchaîne sur le script suivant
+                    }
+                };
+
+                document.body.appendChild(sc);
+            }
+
+            loadNext();
+        }
+
+
         $('.eqLogic[data-eqLogic_uid=#uid#] .weenect-cmd').each(function(e){
             if(!isNaN($(this).data("cmd_id"))){
                 $(this).on('click', function () {
@@ -114,22 +159,29 @@
             }
 
         });
-        var data#tracker_id#=JSON.parse('#json#');
-        var trackerName='#name_display#';
+        function iniWeenectTile(){
+            weenectSetTheme(data#tracker_id#['light-theme'], data#tracker_id#['dark-theme']);
+            weenectCreateMap(#tracker_id#, data#tracker_id#['control-attributions'], data#tracker_id#['control-zoom']);
+            weenectObjects.maps[#tracker_id#].customZoom = parseInt('#zoom#');
 
-        weenectSetTheme(data#tracker_id#['light-theme'], data#tracker_id#['dark-theme']);
-        weenectCreateMap(#tracker_id#, data#tracker_id#['control-attributions'], data#tracker_id#['control-zoom']);
-        weenectObjects.maps[#tracker_id#].customZoom = parseInt('#zoom#');
-
-        
-        weenectCreateMarker(#tracker_id#, data#tracker_id#.tracker);
-        weenectCreatePoint(#tracker_id#, data#tracker_id#.tracker);
-        // for zones
-        for(id in data#tracker_id#.zones){
-            weenectCreateMarker(#tracker_id#, data#tracker_id#.zones[id]);
+            
+            weenectCreateMarker(#tracker_id#, data#tracker_id#.tracker);
+            weenectCreatePoint(#tracker_id#, data#tracker_id#.tracker);
+            // for zones
+            for(id in data#tracker_id#.zones){
+                weenectCreateMarker(#tracker_id#, data#tracker_id#.zones[id]);
+            }
+            weenectFocusFeatureGroup(#tracker_id#);
+            weenectMapLoaded(#tracker_id#);
         }
-        weenectFocusFeatureGroup(#tracker_id#);
-        weenectMapLoaded(#tracker_id#);
+        domUtils(function(){
+            includeJS_seq(
+            ["plugins/weenect/3rdparty/leaflet.js", 
+                "plugins/weenect/3rdparty/heatlayer.js", 
+                "plugins/weenect/core/template/weenect.template.js"
+            ], 
+            iniWeenectTile)
+        });
     </script>
 
 

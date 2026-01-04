@@ -221,6 +221,7 @@ class weenect extends weenect_base {
     $eqLogic->updateCMDfromArray($datas['position'][0]);// for position
     $eqLogic->update_coordinate(self::W_CMD_common['coord']);
     $eqLogic->updateCurrentZone();
+    $eqLogic->updateEqLBatteryStatus();
     log::add('weenect', 'debug', "║ ╠════════════════ End update tracker ");
   }
   /*  ----- Mis à jours des données générales d'un tracker, voire des positions également
@@ -478,6 +479,26 @@ class weenect extends weenect_base {
   }
   public function get_clean_zonename($zName){
     return preg_replace('/'.$this->getName().'-/',"",$zName);
+  }
+   /**  ----- mise à jour de la batterie du tracker
+  * appel à batteryStatus
+   * récupère les valeur des commande 'battery' et 'date_tracker' pour mettre à jour la valeur
+  */
+  public function updateEqLBatteryStatus(){
+    log::add(__CLASS__, 'debug', '║  ╠════════════════ Update Battery Status' );
+    $batCmd = $this->getCmd(null, 'battery');
+    $dateCmd = $this->getCmd(null, 'date_tracker');
+    if(is_object($batCmd) && is_object($dateCmd)){
+      $battery = $batCmd->execCmd();
+      $dateTime = $dateCmd->execCmd();
+      log::add(__CLASS__, 'debug', '║  ║  - battery :'.$battery );
+      log::add(__CLASS__, 'debug', '║  ║  - dateTime :'.$dateTime );
+      $this->batteryStatus($battery, $dateTime);
+    }else{
+      log::add(__CLASS__, 'debug', '║  ╠ ## ERROR on battery and value date command' );
+    }
+    
+    log::add(__CLASS__, 'debug', '║  ╠════════════════ END Battery Status' );
   }
     /* ------------------------------------------------------------------------
      -----------------------------------  ACTIONS -----------------------------
